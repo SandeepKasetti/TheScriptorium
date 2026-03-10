@@ -154,12 +154,6 @@ Every `git push` to `main` triggers an automatic re-deploy.
 
 ---
 
-## 📄 License
-
-MIT License — feel free to fork and build your own Scriptorium.
-
----
-
 <p align="center">
   <em>Knowledge that compounds.</em>
 </p>
