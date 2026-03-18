@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Vol · I · AI Model — The Scriptorium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Noto+Serif:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --bg:#1e2130;
+  --shadow-light:#272b40;
+  --shadow-dark:#131624;
+  --text-primary:#e2e8f0;
+  --text-secondary:#a0aec0;
+  --text-muted:#718096;
+  --text-faint:#4a5568;
+  --neu-raised: 8px 8px 18px var(--shadow-dark), -8px -8px 18px var(--shadow-light);
+  --neu-raised-lg: 12px 12px 28px var(--shadow-dark), -12px -12px 28px var(--shadow-light);
+  --neu-inset: inset 4px 4px 10px var(--shadow-dark), inset -4px -4px 10px var(--shadow-light);
+  --neu-pressed: inset 3px 3px 8px var(--shadow-dark), inset -3px -3px 8px var(--shadow-light);
+  --ff:'Montserrat',sans-serif;
+  --serif:'Noto Serif',serif;
+  --mono:'DM Mono',monospace;
+  --radius:22px;
+  --spring:cubic-bezier(0.16,1,0.3,1);
+}
+
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--text-primary);
+  font-family:var(--ff);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  cursor:none;
+}
+/* Force none on everything so links/buttons don't revert */
+*{ cursor: none !important; }
+
+/* ─── Particle canvas background ─── */
+#particle-canvas{
+  position:fixed;inset:0;z-index:0;
+  pointer-events:none;opacity:.55;
+}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:#3a3f5c;border-radius:3px;}
+
+/* ════════════════════════════════
+   KEYFRAMES — tons of them
+   ════════════════════════════════ */
+
+/* Page entrance */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(32px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes fadeDown{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@keyframes scaleIn{
+  from{opacity:0;transform:scale(.85);}
+  to{opacity:1;transform:scale(1);}
+}
+
+/* Badge */
+@keyframes floatBadge{
+  0%,100%{transform:translateY(0) rotate(-.5deg);}
+  50%{transform:translateY(-7px) rotate(.5deg);}
+}
+@keyframes pulse-dot{
+  0%,100%{transform:scale(1);opacity:.45;box-shadow:0 0 0 0 currentColor;}
+  50%{transform:scale(1.6);opacity:1;box-shadow:0 0 0 5px transparent;}
+}
+
+/* Hero title shimmer */
+@keyframes titleShimmer{
+  0%{background-position:0% 50%;}
+  50%{background-position:100% 50%;}
+  100%{background-position:0% 50%;}
+}
+
+/* Subtitle typewriter blink */
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* Hero pill pulse */
+@keyframes pillGlow{
+  0%,100%{box-shadow:var(--neu-inset);}
+  50%{box-shadow:var(--neu-inset), 0 0 20px rgba(129,140,248,.15);}
+}
+
+/* Card entrance cascade */
+@keyframes cardEntrance{
+  0%{opacity:0;transform:translateY(40px) scale(.95);}
+  60%{opacity:1;transform:translateY(-4px) scale(1.01);}
+  100%{opacity:1;transform:translateY(0) scale(1);}
+}
+
+/* Card idle float — each card gets its own */
+@keyframes float1{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+@keyframes float2{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
+@keyframes float3{0%,100%{transform:translateY(-3px);}50%{transform:translateY(3px);}}
+@keyframes float4{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
+
+/* Shimmer sweep across card on hover */
+@keyframes shimmerSweep{
+  0%{left:-120%;}
+  100%{left:160%;}
+}
+
+/* Emoji chip bounce */
+@keyframes emojiIdleBounce{
+  0%,100%{transform:scale(1) rotate(0deg);}
+  25%{transform:scale(1.08) rotate(-4deg);}
+  75%{transform:scale(1.05) rotate(4deg);}
+}
+
+/* Glow ring orbit around emoji */
+@keyframes orbitRing{
+  from{transform:rotate(0deg) translateX(26px) rotate(0deg);}
+  to{transform:rotate(360deg) translateX(26px) rotate(-360deg);}
+}
+
+/* Arrow bounce on hover */
+@keyframes arrowBounce{
+  0%,100%{transform:translateX(0);}
+  30%{transform:translateX(6px);}
+  60%{transform:translateX(2px);}
+}
+
+/* Tag letter-spacing expand */
+@keyframes tagExpand{
+  from{letter-spacing:.3em;}
+  to{letter-spacing:.5em;}
+}
+
+/* Count pill pop */
+@keyframes countPop{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.12);}
+  100%{transform:scale(1);}
+}
+
+/* Footer fade in */
+@keyframes footerReveal{
+  from{opacity:0;letter-spacing:.5em;}
+  to{opacity:1;letter-spacing:.25em;}
+}
+
+/* Ripple on click */
+@keyframes ripple{
+  from{transform:scale(0);opacity:.5;}
+  to{transform:scale(4);opacity:0;}
+}
+
+/* Background orb drift */
+@keyframes orbDrift{
+  0%{transform:translate(-50%,-50%) scale(1);}
+  33%{transform:translate(-45%,-55%) scale(1.1);}
+  66%{transform:translate(-55%,-45%) scale(.95);}
+  100%{transform:translate(-50%,-50%) scale(1);}
+}
+
+/* Page loader bar */
+@keyframes loaderBar{
+  0%{width:0%;opacity:1;}
+  80%{width:100%;opacity:1;}
+  100%{width:100%;opacity:0;}
+}
+
+/* Icon neon pulse */
+@keyframes iconGlow{
+  0%,100%{filter:drop-shadow(0 0 0px currentColor);}
+  50%{filter:drop-shadow(0 0 8px currentColor);}
+}
+
+/* Scanline scroll */
+@keyframes scanlines{
+  from{background-position:0 0;}
+  to{background-position:0 100%;}
+}
+
+/* Cursor dot */
+@keyframes cursorPulse{
+  0%,100%{transform:translate(-50%,-50%) scale(1);}
+  50%{transform:translate(-50%,-50%) scale(1.4);}
+}
+
+/* Card text stagger */
+@keyframes textSlideIn{
+  from{opacity:0;transform:translateX(-12px);}
+  to{opacity:1;transform:translateX(0);}
+}
+
+/* Neon border trace on hover */
+@keyframes borderTrace{
+  0%{background-position:0% 0%;}
+  100%{background-position:200% 0%;}
+}
+
+/* Icon chip spin on load */
+@keyframes chipSpin{
+  from{transform:rotate(-15deg) scale(.8);opacity:0;}
+  to{transform:rotate(0deg) scale(1);opacity:1;}
+}
+
+/* ─── Floating Back Button ─── */
+#back-btn{
+  position:fixed;top:24px;left:24px;z-index:9999;
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 20px;
+  background:var(--bg);
+  box-shadow:var(--neu-raised);
+  border-radius:50px;
+  font-family:var(--ff);font-size:12px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text-secondary);
+  text-decoration:none;
+  transition:box-shadow .3s var(--spring), color .25s, transform .3s var(--spring);
+  animation:fadeDown .6s var(--spring) both;
+}
+#back-btn::before{
+  content:'←';
+  font-size:14px;
+  transition:transform .3s var(--spring);
+  display:inline-block;
+}
+#back-btn:hover{
+  box-shadow:var(--neu-inset);
+  color:var(--text-primary);
+  transform:translateY(-2px);
+}
+#back-btn:hover::before{
+  transform:translateX(-4px);
+}
+body.light #back-btn{background:var(--surface-raised,#f8f4ed);}
+
+/* ─── Light theme overrides ─── */
+body.light{
+  --bg:#f0ece3;
+  --surface-raised:#f8f4ed;
+  --surface-sunken:#e5e0d5;
+  --surface-deep:#d8d2c6;
+  --shadow-light:#ffffff;
+  --shadow-dark:#d4cec5;
+  --neu-raised: 5px 5px 12px var(--shadow-dark), -5px -5px 12px var(--shadow-light);
+  --neu-raised-lg: 8px 8px 20px var(--shadow-dark), -8px -8px 20px var(--shadow-light);
+  --neu-inset: inset 3px 3px 8px var(--shadow-dark), inset -3px -3px 8px var(--shadow-light);
+  --neu-pressed: inset 2px 2px 6px var(--shadow-dark), inset -2px -2px 6px var(--shadow-light);
+  --text-primary:#14100c;
+  --text-secondary:#3a3028;
+  --text-muted:#5c4f42;
+  --text-faint:#7a6a58;
+  --accent-gold:#e8a020;
+  --accent-gold-dark:#b87a10;
+  --accent-gold-bright:#f5c260;
+}
+body.light #particle-canvas{opacity:.18;}
+body.light .orb{opacity:.08;}
+body.light #scanlines{opacity:.15;}
+
+/* Light theme — card uses raised surface */
+body.light .card,
+body.light .vol-badge,
+body.light .hero-pill,
+body.light .card-count,
+body.light .card-arrow,
+body.light .emoji-chip,
+body.light #theme-toggle{ background:var(--surface-raised,#f8f4ed); }
+
+/* Light theme — badge / pill insets use sunken surface */
+body.light .card-count,
+body.light .hero-pill{ background:var(--surface-sunken,#e5e0d5); }
+
+/* Light theme — badge & vol text use gold accent */
+body.light .badge-txt,
+body.light .dot{ color:var(--accent-gold-dark,#b87a10); }
+body.light .dot{ background:var(--accent-gold,#e8a020); }
+
+/* Light theme — hero title gradient: gold → indigo */
+body.light .hero-title{
+  background:linear-gradient(270deg,#e8a020,#b87a10,#7aa2f7,#e8a020);
+  background-size:400% 400%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* Light theme — toggle hover uses gold */
+body.light #theme-toggle:hover svg{ stroke:var(--accent-gold,#e8a020); }
+
+/* Light theme — hero subtitle cursor blink */
+body.light .hero-sub::after{ color:var(--accent-gold,#e8a020); }
+
+/* Light theme — orbs shift to warm amber tones */
+body.light .orb1{ background:radial-gradient(circle,#e8a020,transparent); }
+body.light .orb2{ background:radial-gradient(circle,#f5c260,transparent); }
+body.light .orb3{ background:radial-gradient(circle,#7aa2f7,transparent); }
+
+/* Light theme — card accent colours adjusted for readability */
+body.light .c-blue   .card-tag,
+body.light .c-blue   .card-count,
+body.light .c-blue   .card-arrow{ color:#2563eb; }
+body.light .c-blue   .emoji-chip svg{ stroke:#2563eb; }
+
+body.light .c-green  .card-tag,
+body.light .c-green  .card-count,
+body.light .c-green  .card-arrow{ color:#059669; }
+body.light .c-green  .emoji-chip svg{ stroke:#059669; }
+
+body.light .c-orange .card-tag,
+body.light .c-orange .card-count,
+body.light .c-orange .card-arrow{ color:#b87a10; }
+body.light .c-orange .emoji-chip svg{ stroke:#b87a10; }
+
+body.light .c-purple .card-tag,
+body.light .c-purple .card-count,
+body.light .c-purple .card-arrow{ color:#7c3aed; }
+body.light .c-purple .emoji-chip svg{ stroke:#7c3aed; }
+
+body.light .c-cyan   .card-tag,
+body.light .c-cyan   .card-count,
+body.light .c-cyan   .card-arrow{ color:#0e7490; }
+body.light .c-cyan   .emoji-chip svg{ stroke:#0e7490; }
+
+body.light .c-amber  .card-tag,
+body.light .c-amber  .card-count,
+body.light .c-amber  .card-arrow{ color:#e8a020; }
+body.light .c-amber  .emoji-chip svg{ stroke:#e8a020; }
+
+body.light .c-indigo .card-tag,
+body.light .c-indigo .card-count,
+body.light .c-indigo .card-arrow{ color:#4338ca; }
+body.light .c-indigo .emoji-chip svg{ stroke:#4338ca; }
+
+body.light .c-teal   .card-tag,
+body.light .c-teal   .card-count,
+body.light .c-teal   .card-arrow{ color:#059669; }
+body.light .c-teal   .emoji-chip svg{ stroke:#059669; }
+
+/* Light theme — card footer divider */
+body.light .card-footer{ border-top-color:rgba(20,16,12,.1); }
+body.light .card-link:hover .card-title{color:#14100c;text-shadow:none;}
+body.light .card-link:hover .card{
+  box-shadow:10px 10px 24px #d4cec5, -10px -10px 24px #ffffff;
+}
+
+/* Light theme — cursor becomes gold */
+body.light #cursor-dot{
+  background:var(--accent-gold,#e8a020);
+  box-shadow:0 0 12px 4px #e8a020, 0 0 24px 8px rgba(232,160,32,.4);
+}
+body.light #cursor-dot.cursor-hover{
+  background:var(--accent-gold-bright,#f5c260);
+}
+
+/* ─── Theme toggle button ─── */
+/* ─── Theme toggle wrapper (scroll hide/show) ─── */
+#theme-toggle-wrap{
+  position:fixed;top:20px;right:24px;z-index:9000;
+  transition:transform .3s ease, opacity .3s ease;
+}
+#theme-toggle-wrap.hide{
+  transform:translateY(-90px);
+  opacity:0;
+  pointer-events:none;
+}
+/* ─── Theme toggle button (hover/spin interactions) ─── */
+#theme-toggle{
+  width:46px;height:46px;border-radius:50%;
+  background:var(--bg);
+  box-shadow:var(--neu-raised);
+  border:none;
+  display:flex;align-items:center;justify-content:center;
+  transition:box-shadow .25s, transform .2s var(--spring), background .3s;
+  animation:fadeDown .5s var(--spring) .8s both;
+}
+#theme-toggle:hover{
+  box-shadow:var(--neu-raised-lg);
+  transform:scale(1.1) rotate(15deg);
+}
+#theme-toggle:active{
+  box-shadow:var(--neu-pressed);
+  transform:scale(.95);
+}
+#theme-toggle svg{
+  width:20px;height:20px;
+  stroke:var(--text-secondary);
+  fill:none;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .3s, transform .4s var(--spring);
+}
+#theme-toggle:hover svg{ stroke:#818cf8; }
+/* moon shown in dark, sun shown in light */
+#icon-moon{ display:block; }
+#icon-sun { display:none;  }
+body.light #icon-moon{ display:none;  }
+body.light #icon-sun { display:block; }
+
+@keyframes spinOnce{
+  from{transform:rotate(0deg);}
+  to{transform:rotate(360deg);}
+}
+#theme-toggle.spinning svg{ animation:spinOnce .4s ease; }
+#page-loader{
+  position:fixed;top:0;left:0;height:3px;
+  background:linear-gradient(90deg,#818cf8,#c084fc,#22d3ee);
+  z-index:9999;border-radius:0 2px 2px 0;
+  animation:loaderBar 1.2s ease-out forwards;
+  box-shadow:0 0 12px #818cf8;
+}
+
+/* ─── Custom cursor ─── */
+#cursor-dot{
+  position:fixed;pointer-events:none;z-index:99999;
+  width:14px;height:14px;border-radius:50%;
+  background:#818cf8;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 12px 4px #818cf8, 0 0 24px 8px rgba(129,140,248,.45);
+  top:-50px;left:-50px;
+  transition:width .12s,height .12s,background .2s,box-shadow .2s;
+  will-change:top,left;
+}
+body.cursor-hover #cursor-dot{width:20px;height:20px;background:#c084fc;box-shadow:0 0 16px 5px #c084fc,0 0 32px 10px rgba(192,132,252,.45);}
+@media(pointer:coarse){#cursor-dot{display:none;}}
+
+/* ─── Scanline overlay ─── */
+#scanlines{
+  position:fixed;inset:0;pointer-events:none;z-index:3;
+  background:repeating-linear-gradient(
+    0deg,
+    transparent,transparent 2px,
+    rgba(0,0,0,.04) 2px,rgba(0,0,0,.04) 4px
+  );
+  opacity:.6;
+}
+
+/* ─── Card spotlight ─── */
+.card-spotlight{
+  position:absolute;inset:0;border-radius:var(--radius);
+  background:radial-gradient(circle 120px at 0% 0%, rgba(255,255,255,.06), transparent 70%);
+  pointer-events:none;z-index:1;opacity:0;
+  transition:opacity .3s;
+}
+.card-link:hover .card-spotlight{opacity:1;}
+
+/* ─── Icon glow on idle ─── */
+.emoji-chip svg{
+  width:26px;height:26px;stroke-width:1.8;
+  transition:transform .3s var(--spring);
+  animation:iconGlow 3s ease-in-out infinite;
+}
+.card-link:nth-child(2) .emoji-chip svg{animation-delay:.4s;}
+.card-link:nth-child(3) .emoji-chip svg{animation-delay:.8s;}
+.card-link:nth-child(4) .emoji-chip svg{animation-delay:1.2s;}
+.card-link:nth-child(5) .emoji-chip svg{animation-delay:.6s;}
+.card-link:nth-child(6) .emoji-chip svg{animation-delay:1.0s;}
+.card-link:nth-child(7) .emoji-chip svg{animation-delay:1.4s;}
+.card-link:nth-child(8) .emoji-chip svg{animation-delay:.2s;}
+
+/* ─── Chip entrance animation ─── */
+.emoji-chip{
+  animation:emojiIdleBounce 4s ease-in-out infinite, chipSpin .6s var(--spring) both;
+}
+.card-link:nth-child(1) .emoji-chip{animation-delay:0s,.15s;}
+.card-link:nth-child(2) .emoji-chip{animation-delay:.5s,.25s;}
+.card-link:nth-child(3) .emoji-chip{animation-delay:1s,.35s;}
+.card-link:nth-child(4) .emoji-chip{animation-delay:1.5s,.45s;}
+.card-link:nth-child(5) .emoji-chip{animation-delay:.3s,.55s;}
+.card-link:nth-child(6) .emoji-chip{animation-delay:.9s,.65s;}
+.card-link:nth-child(7) .emoji-chip{animation-delay:1.3s,.75s;}
+.card-link:nth-child(8) .emoji-chip{animation-delay:.7s,.85s;}
+
+/* ─── Card text stagger on entrance ─── */
+.card-tag  {animation:textSlideIn .5s var(--spring) both;}
+.card-title{animation:textSlideIn .5s var(--spring) .07s both;}
+.card-desc {animation:textSlideIn .5s var(--spring) .14s both;}
+.card-footer{animation:textSlideIn .5s var(--spring) .2s both;}
+
+/* ─── Neon border on hover ─── */
+.card::before{
+  content:'';
+  position:absolute;top:0;left:-120%;
+  width:60%;height:100%;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.06) 50%,transparent 60%);
+  pointer-events:none;z-index:2;
+  transition:none;
+}
+.card-link:hover .card::before{
+  animation:shimmerSweep .7s ease forwards;
+}
+
+/* neon glow border trace */
+.card-neon-border{
+  position:absolute;inset:-1px;border-radius:calc(var(--radius) + 1px);
+  background:linear-gradient(90deg,transparent,currentColor,transparent);
+  background-size:200% 100%;
+  opacity:0;pointer-events:none;z-index:0;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor;
+  mask-composite:exclude;
+  padding:1px;
+  transition:opacity .3s;
+}
+.card-link:hover .card-neon-border{
+  opacity:.6;
+  animation:borderTrace 1.5s linear infinite;
+}
+
+/* ─── Typewriter cursor on subtitle ─── */
+.hero-sub::after{
+  content:'|';
+  animation:blink 1s step-end infinite;
+  margin-left:2px;
+  color:#818cf8;
+  font-weight:300;
+}
+
+/* ─── Hover: card inner content brightens ─── */
+.card-link:hover .card-tag{letter-spacing:.5em;transition:letter-spacing .35s ease;}
+.card-link:hover .card-title{color:#fff;text-shadow:0 0 20px rgba(255,255,255,.15);}
+.card-link:hover .card-desc{color:var(--text-primary);}
+.card-link:hover .card-footer{border-color:rgba(255,255,255,.15);}
+
+/* ─── Layout ─── */
+.page-wrap{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:60px 20px 80px;
+  position:relative;z-index:1;
+}
+.inner{width:100%;max-width:820px;}
+
+/* ─── Ambient orbs ─── */
+.orb{
+  position:fixed;border-radius:50%;pointer-events:none;z-index:0;
+  filter:blur(80px);opacity:.18;
+  animation:orbDrift 14s ease-in-out infinite;
+}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,#818cf8,transparent);top:10%;left:15%;animation-duration:16s;}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,#c084fc,transparent);top:50%;right:10%;animation-duration:20s;animation-delay:-5s;}
+.orb3{width:300px;height:300px;background:radial-gradient(circle,#22d3ee,transparent);bottom:10%;left:30%;animation-duration:18s;animation-delay:-9s;}
+
+/* ─── Badge ─── */
+.badge-wrap{
+  display:flex;justify-content:center;
+  animation:fadeDown .6s var(--spring) both;
+}
+.vol-badge{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--bg);
+  box-shadow:var(--neu-raised);
+  border-radius:50px;padding:11px 24px;margin-bottom:44px;
+  animation:floatBadge 4s ease-in-out infinite;
+}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:#818cf8;color:#818cf8;
+  animation:pulse-dot 2s ease-in-out infinite;
+}
+.dot2{animation-delay:.8s;}
+.badge-txt{
+  font-family:var(--mono);font-size:10px;
+  letter-spacing:.28em;text-transform:uppercase;color:#818cf8;font-weight:500;
+}
+
+/* ─── Hero ─── */
+.hero{
+  text-align:center;margin-bottom:56px;
+  animation:fadeUp .8s var(--spring) .2s both;
+}
+.hero-title{
+  font-size:clamp(28px,5.5vw,52px);font-weight:800;
+  letter-spacing:-.03em;line-height:1.1;margin-bottom:10px;
+  background:linear-gradient(270deg,#818cf8,#c084fc,#60a5fa,#2dd4bf,#818cf8);
+  background-size:400% 400%;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:titleShimmer 6s ease infinite;
+}
+.hero-sub{
+  font-size:clamp(14px,2.2vw,20px);font-weight:500;
+  color:var(--text-secondary);margin-bottom:20px;
+  animation:fadeUp .7s var(--spring) .4s both;
+}
+.hero-pill{
+  display:inline-block;
+  background:var(--bg);
+  border-radius:50px;padding:9px 22px;
+  font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;
+  animation:pillGlow 3s ease-in-out infinite, fadeUp .7s var(--spring) .5s both;
+}
+
+/* ─── Grid ─── */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  grid-auto-rows:1fr;
+  gap:26px;
+}
+
+/* ─── Card link wrapper ─── */
+.card-link{
+  text-decoration:none;display:block;height:100%;
+  border-radius:var(--radius);outline:none;
+  animation:cardEntrance .7s var(--spring) both;
+  /* each card floats at different speed */
+}
+.card-link:nth-child(1){animation-delay:.1s; animation-name:cardEntrance;}
+.card-link:nth-child(2){animation-delay:.18s;}
+.card-link:nth-child(3){animation-delay:.26s;}
+.card-link:nth-child(4){animation-delay:.34s;}
+.card-link:nth-child(5){animation-delay:.42s;}
+.card-link:nth-child(6){animation-delay:.50s;}
+.card-link:nth-child(7){animation-delay:.58s;}
+.card-link:nth-child(8){animation-delay:.66s;}
+
+/* idle float applied to the inner .card */
+.card-link:nth-child(odd)  .card{ animation:float1 5.5s ease-in-out infinite;}
+.card-link:nth-child(even) .card{ animation:float2 6.5s ease-in-out infinite .8s;}
+.card-link:nth-child(3n)   .card{ animation:float3 7s   ease-in-out infinite 1.2s;}
+.card-link:nth-child(4n)   .card{ animation:float4 5s   ease-in-out infinite .4s;}
+
+/* ─── Card ─── */
+.card{
+  background:var(--bg);
+  border-radius:var(--radius);
+  padding:28px 26px 22px;
+  box-shadow:var(--neu-raised-lg);
+  display:flex;flex-direction:column;justify-content:space-between;
+  height:100%;min-height:215px;
+  transition:box-shadow .4s var(--spring), transform .4s var(--spring);
+  position:relative;overflow:hidden;
+  will-change:transform;
+}
+
+/* shimmer sweep layer */
+.card::before{
+  content:'';
+  position:absolute;top:0;left:-120%;
+  width:60%;height:100%;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.06) 50%,transparent 60%);
+  pointer-events:none;z-index:2;
+  transition:none;
+}
+.card-link:hover .card::before{
+  animation:shimmerSweep .7s ease forwards;
+}
+
+/* accent orb top-right */
+.card::after{
+  content:'';position:absolute;
+  top:-50px;right:-50px;
+  width:140px;height:140px;border-radius:50%;
+  opacity:.07;
+  transition:opacity .4s, transform .5s var(--spring);
+  background:currentColor;
+  filter:blur(20px);
+}
+
+.card-link:hover .card{
+  box-shadow:18px 18px 38px var(--shadow-dark),-18px -18px 38px var(--shadow-light);
+  transform:translateY(-8px) scale(1.015) !important; /* override float */
+}
+.card-link:hover .card::after{opacity:.18;transform:scale(1.35);}
+.card-link:active .card{
+  box-shadow:var(--neu-pressed);
+  transform:scale(.97) !important;
+}
+
+/* ─── Emoji chip ─── */
+.emoji-chip{
+  width:54px;height:54px;border-radius:15px;
+  background:var(--bg);box-shadow:var(--neu-raised);
+  display:flex;align-items:center;justify-content:center;
+  font-size:27px;margin-bottom:16px;
+  position:relative;
+  transition:box-shadow .3s, transform .35s var(--spring);
+  animation:emojiIdleBounce 4s ease-in-out infinite;
+}
+.emoji-chip svg{
+  width:26px;height:26px;
+  stroke-width:1.8;
+  transition:transform .3s var(--spring);
+}
+.card-link:nth-child(2) .emoji-chip{animation-delay:.5s;}
+.card-link:nth-child(3) .emoji-chip{animation-delay:1s;}
+.card-link:nth-child(4) .emoji-chip{animation-delay:1.5s;}
+.card-link:nth-child(5) .emoji-chip{animation-delay:.3s;}
+.card-link:nth-child(6) .emoji-chip{animation-delay:.9s;}
+.card-link:nth-child(7) .emoji-chip{animation-delay:1.3s;}
+.card-link:nth-child(8) .emoji-chip{animation-delay:.7s;}
+
+/* orbit dot around emoji */
+.emoji-chip .orbit-dot{
+  position:absolute;width:6px;height:6px;border-radius:50%;
+  background:currentColor;opacity:0;
+  top:50%;left:50%;margin:-3px;
+  transition:opacity .3s;
+  animation:orbitRing 1.8s linear infinite;
+}
+.card-link:hover .emoji-chip .orbit-dot{opacity:.8;}
+
+.card-link:hover .emoji-chip{
+  box-shadow:var(--neu-inset);
+  transform:scale(.9) rotate(8deg);
+}
+
+/* ─── Card text ─── */
+.card-tag{
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:.3em;text-transform:uppercase;font-weight:600;margin-bottom:5px;
+  transition:letter-spacing .3s ease;
+}
+.card-link:hover .card-tag{
+  animation:tagExpand .3s ease forwards;
+}
+.card-title{
+  font-family:'Montserrat',sans-serif;font-size:16.5px;font-weight:700;
+  color:var(--text-primary);margin-bottom:8px;line-height:1.3;
+  transition:color .3s;
+}
+.card-link:hover .card-title{color:#fff;}
+
+.card-desc{
+  font-family:var(--serif);font-size:12px;
+  color:var(--text-secondary);line-height:1.75;
+  transition:color .3s;
+}
+.card-link:hover .card-desc{color:var(--text-primary);}
+
+/* ─── Card footer ─── */
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:20px;padding-top:14px;
+  border-top:1.5px solid rgba(255,255,255,.07);
+  transition:border-color .3s;
+}
+.card-link:hover .card-footer{border-color:rgba(255,255,255,.15);}
+
+.card-count{
+  background:var(--bg);box-shadow:var(--neu-inset);
+  border-radius:30px;padding:5px 13px;
+  font-family:var(--mono);font-size:8px;letter-spacing:.18em;font-weight:500;
+  transition:transform .2s, box-shadow .2s;
+}
+.card-link:hover .card-count{
+  animation:countPop .4s ease;
+}
+
+.card-arrow{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--bg);box-shadow:var(--neu-raised);
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-family:var(--mono);
+  transition:box-shadow .25s, transform .3s var(--spring);
+}
+.card-link:hover .card-arrow{
+  box-shadow:var(--neu-inset);
+  animation:arrowBounce .5s ease forwards;
+}
+
+/* ─── Ripple on click ─── */
+.ripple-el{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.12);
+  width:60px;height:60px;margin:-30px;
+  pointer-events:none;z-index:10;
+  animation:ripple .6s ease-out forwards;
+}
+
+/* ─── Colour accents ─── */
+.c-blue  {color:#3b82f6;}
+.c-green {color:#22c55e;}
+.c-orange{color:#f97316;}
+.c-purple{color:#a855f7;}
+.c-cyan  {color:#06b6d4;}
+.c-amber {color:#f59e0b;}
+.c-indigo{color:#6366f1;}
+.c-teal  {color:#14b8a6;}
+
+.c-blue   .emoji-chip svg{stroke:#60a5fa;}
+.c-green  .emoji-chip svg{stroke:#4ade80;}
+.c-orange .emoji-chip svg{stroke:#fb923c;}
+.c-purple .emoji-chip svg{stroke:#c084fc;}
+.c-cyan   .emoji-chip svg{stroke:#22d3ee;}
+.c-amber  .emoji-chip svg{stroke:#fbbf24;}
+.c-indigo .emoji-chip svg{stroke:#818cf8;}
+.c-teal   .emoji-chip svg{stroke:#2dd4bf;}
+.c-blue   .card-tag,.c-blue   .card-count,.c-blue   .card-arrow{color:#60a5fa;}
+.c-green  .card-tag,.c-green  .card-count,.c-green  .card-arrow{color:#4ade80;}
+.c-orange .card-tag,.c-orange .card-count,.c-orange .card-arrow{color:#fb923c;}
+.c-purple .card-tag,.c-purple .card-count,.c-purple .card-arrow{color:#c084fc;}
+.c-cyan   .card-tag,.c-cyan   .card-count,.c-cyan   .card-arrow{color:#22d3ee;}
+.c-amber  .card-tag,.c-amber  .card-count,.c-amber  .card-arrow{color:#fbbf24;}
+.c-indigo .card-tag,.c-indigo .card-count,.c-indigo .card-arrow{color:#818cf8;}
+.c-teal   .card-tag,.c-teal   .card-count,.c-teal   .card-arrow{color:#2dd4bf;}
+
+/* ─── Footer ─── */
+.page-footer{
+  text-align:center;margin-top:60px;
+  font-family:var(--mono);font-size:9px;
+  letter-spacing:.25em;color:var(--text-faint);text-transform:uppercase;
+  animation:footerReveal 1.2s ease 1.2s both;
+}
+</style>
+</head>
+<body>
+
+<!-- Theme toggle -->
+<div id="theme-toggle-wrap">
+<button id="theme-toggle" aria-label="Toggle theme">
+  <svg id="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  <svg id="icon-sun"  viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+</button>
+</div>
+
+<!-- Page loader -->
+<div id="page-loader"></div>
+<!-- Custom cursor -->
+<div id="cursor-dot"></div>
+<!-- Scanlines -->
+<div id="scanlines"></div>
+
+<!-- Particle canvas -->
+<canvas id="particle-canvas"></canvas>
+
+<!-- Ambient orbs -->
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+
+<!-- Floating Back Button -->
+<a id="back-btn" href="index.html">Back</a>
+
+<div class="page-wrap">
+  <div class="inner">
+
+    <!-- Badge -->
+    <div class="badge-wrap">
+      <div class="vol-badge">
+        <span class="dot"></span>
+        <span class="badge-txt">Vol. I · AI Model</span>
+        <span class="dot dot2"></span>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1 class="hero-title">Types of AI Models</h1>
+      <p class="hero-sub">Flashcard Library</p>
+      <span class="hero-pill">8 Decks · Up to 20 Cards Each · Flip to Reveal</span>
+    </div>
+
+    <!-- Grid -->
+    <div class="grid">
+
+      <a href="llm.html" class="card-link c-blue">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">LLM</div>
+            <h2 class="card-title">Large Language Models</h2>
+            <p class="card-desc">Transformers, attention, training objectives, RLHF & emergent capabilities</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">20 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="lcm.html" class="card-link c-green">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">LCM</div>
+            <h2 class="card-title">Large Concept Models</h2>
+            <p class="card-desc">Concept spaces, semantic reasoning beyond tokens, JEPA architecture</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">15 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="lam.html" class="card-link c-orange">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><line x1="8" y1="15" x2="8" y2="15"/><line x1="16" y1="15" x2="16" y2="15"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">LAM</div>
+            <h2 class="card-title">Large Action Models</h2>
+            <p class="card-desc">Agentic AI, tool use, planning & real-world interaction loops</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">18 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="moe.html" class="card-link c-purple">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="19" cy="19" r="2"/><line x1="12" y1="7" x2="5" y2="17"/><line x1="12" y1="7" x2="19" y2="17"/><line x1="5" y1="19" x2="19" y2="19"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">MoE</div>
+            <h2 class="card-title">Mixture of Experts</h2>
+            <p class="card-desc">Sparse gating, expert routing, conditional compute & scalability</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">18 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="vlm.html" class="card-link c-cyan">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">VLM</div>
+            <h2 class="card-title">Vision Language Models</h2>
+            <p class="card-desc">Image-text alignment, cross-modal attention, visual reasoning</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">20 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="slm.html" class="card-link c-amber">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">SLM</div>
+            <h2 class="card-title">Small Language Models</h2>
+            <p class="card-desc">Distillation, on-device inference, quantization & efficiency</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">18 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="mlm.html" class="card-link c-indigo">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="8" x2="17" y2="8"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="7" y1="16" x2="13" y2="16"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">MLM</div>
+            <h2 class="card-title">Masked Language Models</h2>
+            <p class="card-desc">BERT-style pretraining, bidirectional context, cloze tasks</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">16 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="sam.html" class="card-link c-teal">
+        <div class="card">
+          <div>
+            <div class="card-spotlight"></div><div class="card-neon-border"></div><div class="emoji-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="3" y1="12" x2="21" y2="12"/></svg><span class="orbit-dot"></span></div>
+            <div class="card-tag">SAM</div>
+            <h2 class="card-title">Segment Anything Model</h2>
+            <p class="card-desc">Promptable segmentation, zero-shot vision, image encoder-decoder</p>
+          </div>
+          <div class="card-footer">
+            <span class="card-count">16 CARDS</span>
+            <span class="card-arrow">→</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="page-footer">The Scriptorium · Vol. I · AI Model</div>
+
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════
+   1. PARTICLE CANVAS
+   ══════════════════════════════ */
+(function(){
+  var canvas = document.getElementById('particle-canvas');
+  var ctx = canvas.getContext('2d');
+  var W, H, particles = [], connections = [];
+  var COLORS = ['#818cf8','#c084fc','#60a5fa','#2dd4bf','#fb923c','#4ade80'];
+  var NUM = 70;
+
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+
+  function rand(a,b){ return a + Math.random()*(b-a); }
+
+  for(var i=0; i<NUM; i++){
+    particles.push({
+      x: rand(0,W), y: rand(0,H),
+      vx: rand(-.35,.35), vy: rand(-.35,.35),
+      r: rand(1.2,3),
+      color: COLORS[Math.floor(Math.random()*COLORS.length)],
+      alpha: rand(.3,.8)
+    });
+  }
+
+  var mouse = {x:-9999,y:-9999};
+  window.addEventListener('mousemove',function(e){ mouse.x=e.clientX; mouse.y=e.clientY; });
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    // draw connections
+    for(var i=0;i<particles.length;i++){
+      for(var j=i+1;j<particles.length;j++){
+        var dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+        var dist=Math.sqrt(dx*dx+dy*dy);
+        if(dist<120){
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x,particles[i].y);
+          ctx.lineTo(particles[j].x,particles[j].y);
+          ctx.strokeStyle='rgba(129,140,248,'+(0.12*(1-dist/120))+')';
+          ctx.lineWidth=.6;
+          ctx.stroke();
+        }
+      }
+    }
+    // draw particles + mouse repel
+    for(var i=0;i<particles.length;i++){
+      var p=particles[i];
+      var mdx=p.x-mouse.x, mdy=p.y-mouse.y;
+      var mdist=Math.sqrt(mdx*mdx+mdy*mdy);
+      if(mdist<100){
+        p.vx += mdx/mdist*.3;
+        p.vy += mdy/mdist*.3;
+      }
+      // speed cap
+      var speed=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+      if(speed>1.5){ p.vx=p.vx/speed*1.5; p.vy=p.vy/speed*1.5; }
+
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0||p.x>W) p.vx*=-1;
+      if(p.y<0||p.y>H) p.vy*=-1;
+
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.color;
+      ctx.globalAlpha=p.alpha;
+      ctx.fill();
+      ctx.globalAlpha=1;
+    }
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ══════════════════════════════
+   2. CARD 3D TILT on mousemove
+   ══════════════════════════════ */
+document.querySelectorAll('.card-link').forEach(function(link){
+  var card = link.querySelector('.card');
+  link.addEventListener('mousemove',function(e){
+    var rect = card.getBoundingClientRect();
+    var cx = rect.left + rect.width/2;
+    var cy = rect.top  + rect.height/2;
+    var dx = (e.clientX - cx) / (rect.width/2);
+    var dy = (e.clientY - cy) / (rect.height/2);
+    card.style.transform = 'translateY(-8px) scale(1.015) rotateY('+dx*8+'deg) rotateX('+(-dy*6)+'deg)';
+  });
+  link.addEventListener('mouseleave',function(){
+    card.style.transform = '';
+    card.style.transition = 'transform .5s cubic-bezier(0.16,1,0.3,1), box-shadow .4s cubic-bezier(0.16,1,0.3,1)';
+    setTimeout(function(){ card.style.transition=''; },500);
+  });
+});
+
+/* ══════════════════════════════
+   3. RIPPLE ON CLICK
+   ══════════════════════════════ */
+document.querySelectorAll('.card-link').forEach(function(link){
+  link.addEventListener('click',function(e){
+    e.preventDefault(); // just for demo; remove to follow links
+    var card = link.querySelector('.card');
+    var rect = card.getBoundingClientRect();
+    var rip = document.createElement('span');
+    rip.className = 'ripple-el';
+    rip.style.left = (e.clientX - rect.left)+'px';
+    rip.style.top  = (e.clientY - rect.top)+'px';
+    card.appendChild(rip);
+    setTimeout(function(){ rip.remove(); }, 700);
+    // navigate after brief delay
+    var href = link.getAttribute('href');
+    setTimeout(function(){ window.location.href = href; }, 300);
+  });
+});
+
+/* ══════════════════════════════
+   4. SCROLL REVEAL — extra fadeUp
+   ══════════════════════════════ */
+(function(){
+  if(!('IntersectionObserver' in window)) return;
+  var cards = document.querySelectorAll('.card-link');
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if(en.isIntersecting){
+        en.target.style.opacity='1';
+        en.target.style.transform='none';
+        io.unobserve(en.target);
+      }
+    });
+  },{threshold:.15});
+  cards.forEach(function(c){ io.observe(c); });
+})();
+
+/* ══════════════════════════════
+   5. HERO TITLE GLITCH on hover
+   ══════════════════════════════ */
+(function(){
+  var title = document.querySelector('.hero-title');
+  var orig = title.textContent;
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%';
+  var glitching = false;
+  title.addEventListener('mouseenter',function(){
+    if(glitching) return;
+    glitching = true;
+    var iter = 0;
+    var iv = setInterval(function(){
+      title.textContent = orig.split('').map(function(ch,idx){
+        if(ch===' ') return ' ';
+        if(idx < iter) return orig[idx];
+        return chars[Math.floor(Math.random()*chars.length)];
+      }).join('');
+      if(iter>=orig.length){ clearInterval(iv); title.textContent=orig; glitching=false; }
+      iter+=1.5;
+    },40);
+  });
+})();
+
+/* ══════════════════════════════
+   6. COUNTER ANIMATION on count pills
+   ══════════════════════════════ */
+document.querySelectorAll('.card-count').forEach(function(el){
+  var txt = el.textContent; // e.g. "20 CARDS"
+  var num = parseInt(txt);
+  var done = false;
+  el.closest('.card-link').addEventListener('mouseenter',function(){
+    if(done) return; done=true;
+    var start=0, end=num, dur=600, startTime=null;
+    function step(ts){
+      if(!startTime) startTime=ts;
+      var p=Math.min((ts-startTime)/dur,1);
+      el.textContent = Math.floor(p*end)+' CARDS';
+      if(p<1) requestAnimationFrame(step);
+      else el.textContent=txt;
+    }
+    requestAnimationFrame(step);
+  });
+});
+
+/* init Lucide icons */
+
+
+/* ══════════════════════════════
+   THEME TOGGLE
+   ══════════════════════════════ */
+(function(){
+  var btn  = document.getElementById('theme-toggle');
+  var wrap = document.getElementById('theme-toggle-wrap');
+  var saved = localStorage.getItem('theme');
+  if(saved === 'light') document.body.classList.add('light');
+
+  btn.addEventListener('click', function(){
+    btn.classList.add('spinning');
+    setTimeout(function(){ btn.classList.remove('spinning'); }, 420);
+    document.body.classList.toggle('light');
+    localStorage.setItem('theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  });
+
+  // scroll hide / show
+  var lastScrollTop = 0;
+  window.addEventListener('scroll', function(){
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if(scrollTop > lastScrollTop && scrollTop > 100){
+      wrap.classList.add('hide');
+    } else {
+      wrap.classList.remove('hide');
+    }
+    lastScrollTop = scrollTop;
+  });
+})();
+
+/* ══════════════════════════════
+   7. CUSTOM CURSOR
+   ══════════════════════════════ */
+(function(){
+  var dot = document.getElementById('cursor-dot');
+  if(!dot) return;
+  window.addEventListener('mousemove',function(e){
+    dot.style.left = e.clientX + 'px';
+    dot.style.top  = e.clientY + 'px';
+  });
+  document.querySelectorAll('a,.card,.card-link,button').forEach(function(el){
+    el.addEventListener('mouseenter',function(){
+      document.body.classList.add('cursor-hover');
+      dot.classList.add('cursor-hover');
+    });
+    el.addEventListener('mouseleave',function(){
+      document.body.classList.remove('cursor-hover');
+      dot.classList.remove('cursor-hover');
+    });
+  });
+})();
+
+/* ══════════════════════════════
+   8. CARD SPOTLIGHT FOLLOW
+   ══════════════════════════════ */
+document.querySelectorAll('.card-link').forEach(function(link){
+  var spotlight = link.querySelector('.card-spotlight');
+  var card = link.querySelector('.card');
+  link.addEventListener('mousemove',function(e){
+    if(!spotlight) return;
+    var rect = card.getBoundingClientRect();
+    var x = ((e.clientX - rect.left) / rect.width  * 100).toFixed(1);
+    var y = ((e.clientY - rect.top)  / rect.height * 100).toFixed(1);
+    spotlight.style.background =
+      'radial-gradient(circle 130px at '+x+'% '+y+'%, rgba(255,255,255,.07), transparent 70%)';
+  });
+});
+
+/* ══════════════════════════════
+   9. TYPEWRITER HERO SUBTITLE
+   ══════════════════════════════ */
+(function(){
+  var el = document.querySelector('.hero-sub');
+  var txt = el.textContent;
+  el.textContent = '';
+  el.style.opacity = '1';
+  var i = 0;
+  function type(){
+    if(i <= txt.length){
+      el.textContent = txt.slice(0, i);
+      i++;
+      setTimeout(type, 55);
+    }
+  }
+  setTimeout(type, 700);
+})();
+
+/* ══════════════════════════════
+   10. ICON SPIN ON CARD HOVER
+   ══════════════════════════════ */
+document.querySelectorAll('.card-link').forEach(function(link){
+  var svg = link.querySelector('.emoji-chip svg');
+  link.addEventListener('mouseenter',function(){
+    if(!svg) return;
+    svg.style.transform='rotate(360deg) scale(1.15)';
+    svg.style.transition='transform .6s cubic-bezier(0.16,1,0.3,1)';
+  });
+  link.addEventListener('mouseleave',function(){
+    if(!svg) return;
+    svg.style.transform='rotate(0deg) scale(1)';
+    svg.style.transition='transform .4s ease';
+  });
+});
+
+/* ══════════════════════════════
+   11. STAGGERED CARD TEXT REVEAL
+       re-trigger on scroll into view
+   ══════════════════════════════ */
+(function(){
+  if(!('IntersectionObserver' in window)) return;
+  document.querySelectorAll('.card').forEach(function(card){
+    var els = card.querySelectorAll('.card-tag,.card-title,.card-desc,.card-footer');
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(en.isIntersecting){
+          els.forEach(function(el,i){
+            el.style.animationDelay = (i*0.07)+'s';
+            el.style.animationName  = 'none';
+            requestAnimationFrame(function(){
+              el.style.animationName = 'textSlideIn';
+            });
+          });
+          io.unobserve(en.target);
+        }
+      });
+    },{threshold:.2});
+    io.observe(card);
+  });
+})();
+</script>
+</body>
+</html>

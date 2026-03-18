@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI Models Flashcards — The Scriptorium</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --void:#04050c;
+  --surface:#0c0f1a;
+  --lifted:#111622;
+  --border:rgba(255,255,255,.06);
+  --snow:#dde6f5;
+  --fog:rgba(221,230,245,.50);
+  --mist:rgba(221,230,245,.22);
+  --gold:#f0b429;
+  --gold-bright:#ffd166;
+  --ff:'Syne',sans-serif;
+  --mono:'DM Mono',monospace;
+  --spring:cubic-bezier(0.16,1,0.3,1);
+  --bounce:cubic-bezier(0.34,1.56,0.64,1);
+}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--void);color:var(--snow);
+  font-family:var(--ff);min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;cursor:none;
+}
+@media(pointer:coarse){body{cursor:auto;}}
+
+/* ── Enhanced Spotlight Cursor ── */
+#c-dot{
+  position:fixed;width:10px;height:10px;border-radius:50%;
+  background:var(--gold-bright);pointer-events:none;z-index:99999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 0 2px rgba(240,180,41,.15),0 0 14px 4px var(--gold),0 0 30px 8px rgba(240,180,41,.3);
+  transition:width .14s var(--spring),height .14s var(--spring),box-shadow .25s,background .2s;
+  will-change:left,top;
+}
+
+#c-spotlight{
+  position:fixed;inset:0;pointer-events:none;z-index:1;
+  transition:background .04s linear;
+}
+body.ch #c-dot{width:14px;height:14px;background:#fff;
+  box-shadow:0 0 0 3px rgba(240,180,41,.2),0 0 20px 6px var(--gold),0 0 50px 16px rgba(240,180,41,.25);}
+
+body.cc #c-dot{width:5px;height:5px;background:var(--gold-bright);
+  box-shadow:0 0 0 6px rgba(240,180,41,.15),0 0 24px 10px var(--gold),0 0 55px 20px rgba(240,180,41,.35);}
+
+body.ct #c-dot{width:3px;height:22px;border-radius:2px;background:var(--gold-bright);}
+
+@media(pointer:coarse){#c-dot,#c-spotlight{display:none;}}
+
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--void);}
+::-webkit-scrollbar-thumb{background:#2a1800;border-radius:2px;}
+
+/* ── Dot grid ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(circle,rgba(240,180,41,.06) 1px,transparent 1px);
+  background-size:36px 36px;
+  mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 50%,black 20%,transparent 100%);
+  animation:gridDrift 30s ease-in-out infinite alternate;
+}
+
+@keyframes gridDrift{from{background-position:0 0;}to{background-position:36px 36px;}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
+@keyframes cardIn{from{opacity:0;transform:scale(.93) translateY(18px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes panelIn{from{opacity:0;transform:translateY(-10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes shimmer{from{background-position:-200% center;}to{background-position:200% center;}  }
+@keyframes pulse{0%,100%{opacity:.35;transform:scale(1);}50%{opacity:.7;transform:scale(1.06);}}
+@keyframes floatP{
+  0%{transform:translateY(0) translateX(0) scale(1);opacity:0;}
+  10%{opacity:1;}90%{opacity:.5;}
+  100%{transform:translateY(-120vh) translateX(var(--dx)) scale(.3);opacity:0;}
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px) scale(.95);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes toastOut{from{opacity:1;}to{opacity:0;transform:translateY(-8px) scale(.95);}}
+@keyframes streakPop{0%{transform:scale(1);}50%{transform:scale(1.4);}100%{transform:scale(1);}}
+@keyframes confettiDrop{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(110px) rotate(720deg);opacity:0;}}
+@keyframes pipPulse{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.4);}}
+@keyframes drawX{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+@keyframes orbPulse{0%,100%{opacity:.3;transform:scale(1);}50%{opacity:.6;transform:scale(1.06);}}
+
+/* ── Shimmer text ── */
+.shimmer-txt{
+  background:linear-gradient(90deg,#fff 0%,#fff 40%,rgba(255,255,255,.4) 50%,#fff 60%,#fff 100%);
+  background-size:200% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:shimmer 3s linear infinite;
+}
+
+/* ── KBD ── */
+.kbd{
+  display:inline-block;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);border-radius:5px;
+  padding:2px 7px;font-family:var(--mono);font-size:10px;color:rgba(255,255,255,.38);
+}
+
+/* ── 3D Flip ── */
+.card-scene{
+  animation:cardIn .45s cubic-bezier(.34,1.56,.64,1) forwards;
+  perspective:1200px;cursor:pointer;
+}
+.flip-wrap{
+  transition:transform .65s cubic-bezier(.4,.2,.2,1);
+  transform-style:preserve-3d;position:relative;width:100%;
+}
+.flip-wrap.flipped{transform:rotateY(180deg);}
+.face,.back-face{
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  border-radius:22px;width:100%;
+}
+.face{position:relative;min-height:340px;}
+.back-face{position:absolute;top:0;left:0;min-height:100%;transform:rotateY(180deg);}
+
+/* ── Buttons ── */
+.btn-nav{transition:all .2s ease;}
+.btn-nav:hover{background:rgba(255,255,255,.08)!important;transform:translateY(-1px);}
+.btn-nav:active{transform:scale(.97);}
+.btn-flip{transition:all .25s ease;position:relative;overflow:hidden;}
+.btn-flip:hover{transform:translateY(-2px);filter:brightness(1.15);}
+.btn-flip:active{transform:scale(.97);}
+.rating-btn{transition:all .2s cubic-bezier(.34,1.56,.64,1);cursor:pointer;border:none;outline:none;}
+.rating-btn:hover{transform:scale(1.12) translateY(-1px);}
+.rating-btn:active{transform:scale(.95);}
+.dot{transition:all .4s cubic-bezier(.34,1.56,.64,1);cursor:pointer;}
+.dot:hover{transform:scale(1.7)!important;}
+
+/* ── Filter pills ── */
+.tag-pill{transition:all .22s;cursor:pointer;}
+.tag-pill:hover{filter:brightness(1.3);transform:scale(1.05);}
+
+/* ── Search ── */
+.search-input{
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);
+  border-radius:10px;padding:9px 36px 9px 36px;color:#fff;
+  font-family:var(--mono);font-size:12px;width:100%;outline:none;
+  transition:border-color .2s;
+}
+.search-input:focus{border-color:rgba(255,255,255,.22);}
+.search-input::placeholder{color:rgba(255,255,255,.2);}
+
+/* ── Toast ── */
+.toast{animation:toastIn .3s ease forwards;}
+.toast.out{animation:toastOut .3s ease forwards;}
+
+/* ── Confetti ── */
+.confetti{position:fixed;pointer-events:none;z-index:9999;animation:confettiDrop .9s ease-in forwards;}
+
+/* ── Stats panel ── */
+.stats-panel{animation:panelIn .25s ease forwards;}
+
+/* ── Confirm overlay ── */
+.confirm-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;
+  display:flex;align-items:center;justify-content:center;
+  animation:toastIn .2s ease forwards;backdrop-filter:blur(4px);
+}
+
+/* ── Streak ── */
+.streak-num{display:inline-block;animation:streakPop .4s ease;}
+</style>
+</head>
+<body>
+<div id="c-dot"></div>
+<div id="c-spotlight"></div>
+
+<!-- PARTICLES CANVAS -->
+<div id="particles" style="position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden;"></div>
+<!-- AMBIENT ORB -->
+<div id="amb-orb" style="position:fixed;width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(240,180,41,.07) 0%,transparent 70%);
+  top:5%;left:50%;transform:translateX(-50%);pointer-events:none;z-index:0;
+  animation:orbPulse 4s ease-in-out infinite;transition:background .7s ease;"></div>
+<!-- GRID OVERLAY -->
+<div style="position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);"></div>
+
+<!-- CONFETTI CONTAINER -->
+<div id="confetti-container" style="position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden;"></div>
+<!-- TOAST -->
+<div id="toast" style="position:fixed;bottom:32px;left:50%;transform:translateX(-50%);
+  border-radius:12px;padding:10px 20px;z-index:1000;
+  font-family:var(--mono);font-size:12px;letter-spacing:.1em;white-space:nowrap;
+  display:none;pointer-events:none;"></div>
+<!-- CONFIRM DIALOG -->
+<div id="confirm-overlay" class="confirm-overlay" style="display:none;">
+  <div id="confirm-box" style="background:rgba(10,10,20,.98);border:1px solid rgba(122,162,247,.3);
+    border-radius:20px;padding:28px 32px;max-width:340px;width:90%;
+    box-shadow:0 0 40px rgba(122,162,247,.1);">
+    <div style="font-size:13px;color:rgba(255,255,255,.7);font-family:var(--mono);
+      line-height:1.6;margin-bottom:22px;text-align:center;">
+      Reset all progress? This clears your seen cards, ratings, bookmarks and streak.
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="confirm-cancel" style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
+        color:rgba(255,255,255,.4);padding:9px 22px;border-radius:9px;cursor:pointer;
+        font-family:var(--ff);font-size:12px;font-weight:600;transition:all .2s;">Cancel</button>
+      <button id="confirm-ok" style="border:none;padding:9px 22px;border-radius:9px;cursor:pointer;
+        font-family:var(--ff);font-size:12px;font-weight:700;transition:all .2s;">Reset Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" style="min-height:100vh;display:flex;flex-direction:column;align-items:center;
+  padding:28px 16px 60px;position:relative;z-index:2;">
+
+  <!-- BACK + NAV BAR -->
+  <div style="width:100%;max-width:680px;display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+    <a href="index.html" id="back-btn"
+      style="font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;
+      color:rgba(221,230,245,.35);text-decoration:none;display:flex;align-items:center;gap:8px;
+      border:1px solid rgba(255,255,255,.07);padding:8px 14px;border-radius:9px;
+      background:rgba(255,255,255,.02);transition:all .2s;">
+      ← Scriptorium
+    </a>
+    <div style="font-family:var(--mono);font-size:9px;letter-spacing:.24em;text-transform:uppercase;
+      color:rgba(240,180,41,.5);display:flex;align-items:center;gap:7px;">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--gold);
+        animation:pipPulse 2.5s ease-in-out infinite;display:inline-block;"></span>
+      Vol. I · AI Model
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <div style="text-align:center;margin-bottom:24px;animation:slideUp .5s ease forwards;width:100%;max-width:680px;">
+    <div style="display:inline-flex;align-items:center;gap:8px;
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
+      border-radius:30px;padding:5px 16px;margin-bottom:14px;">
+      <div id="pip" style="width:5px;height:5px;border-radius:50%;background:var(--gold);
+        box-shadow:0 0 8px var(--gold);animation:pulse 2s infinite;"></div>
+      <span style="font-size:9px;letter-spacing:.3em;color:rgba(255,255,255,.35);
+        text-transform:uppercase;font-family:var(--mono);">AI Model Study Deck · 20 Cards</span>
+    </div>
+    <h1 style="font-size:clamp(26px,5vw,46px);line-height:1.1;font-weight:800;letter-spacing:-.03em;">
+      <span class="shimmer-txt">AI Model</span><br/>
+      <span id="title-accent" style="transition:color .5s,text-shadow .5s;font-size:clamp(18px,3vw,30px);font-weight:600;letter-spacing:.01em;">From Neurons to Intelligence</span>
+    </h1>
+  </div>
+
+  <div style="width:100%;max-width:680px;" id="main-content">
+
+    <!-- TOOLBAR -->
+    <div style="display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-bottom:18px;" id="toolbar">
+    </div>
+
+    <!-- SEARCH BAR -->
+    <div id="search-wrap" style="position:relative;margin-bottom:14px;display:none;">
+      <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);
+        color:rgba(255,255,255,.25);font-size:14px;pointer-events:none;">⌕</span>
+      <input class="search-input" id="search-input" placeholder="Search cards…" autocomplete="off"/>
+      <button id="search-clear" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);
+        background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:16px;
+        line-height:1;padding:2px 4px;display:none;">✕</button>
+      <span id="search-count" style="position:absolute;right:38px;top:50%;transform:translateY(-50%);
+        font-size:9px;color:rgba(255,255,255,.22);font-family:var(--mono);display:none;"></span>
+    </div>
+
+    <!-- STATS PANEL -->
+    <div id="stats-panel" class="stats-panel" style="
+      background:rgba(10,10,20,.95);border:1px solid rgba(255,255,255,.07);
+      border-radius:20px;padding:24px;backdrop-filter:blur(20px);
+      margin-bottom:18px;display:none;"></div>
+
+    <!-- FILTER PILLS -->
+    <div id="filter-bar" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:16px;justify-content:center;"></div>
+
+    <!-- PROGRESS ROW -->
+    <div style="margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+        <div style="display:flex;align-items:center;gap:8px;" id="cat-label"></div>
+        <span id="pos-label" style="font-size:9px;color:rgba(255,255,255,.25);font-family:var(--mono);"></span>
+      </div>
+      <div style="height:2px;background:rgba(255,255,255,.05);border-radius:1px;overflow:hidden;">
+        <div id="progress-bar" style="height:100%;border-radius:1px;transition:width .5s ease,background .4s ease;width:0%;"></div>
+      </div>
+    </div>
+
+    <!-- CARD AREA -->
+    <div id="card-area" style="margin-bottom:14px;"></div>
+
+    <!-- NAV CONTROLS -->
+    <div style="display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:20px;" id="nav-controls">
+    </div>
+
+    <!-- DOT NAV -->
+    <div id="dot-nav" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:500px;margin:0 auto 18px;"></div>
+
+    <!-- KEYBOARD HINTS -->
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;
+      padding:12px 16px;background:rgba(255,255,255,.015);
+      border:1px solid rgba(255,255,255,.04);border-radius:14px;" id="kbd-hints">
+    </div>
+    <div style="text-align:center;margin-top:10px;font-size:9px;
+      color:rgba(255,255,255,.1);font-family:var(--mono);letter-spacing:.12em;">
+      SWIPE ← → TO NAVIGATE · SWIPE ↑ TO FLIP
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+   DATA
+════════════════════════════════════════════════ */
+var ALL_CARDS = [
+  {id:1,  category:"FUNDAMENTALS", icon:"◈", tag:"Core Concept",
+   front:"What is an AI Model?",
+   back:"A mathematical function trained on data to learn patterns and make predictions or decisions. It transforms inputs (text, images, numbers) into outputs (answers, classifications, generations) — without being explicitly programmed for each task.",
+   gradient:"linear-gradient(135deg,#0f2027,#203a43,#2c5364)", glow:"#00d4ff"},
+
+  {id:2,  category:"FUNDAMENTALS", icon:"◉", tag:"History",
+   front:"How did AI Models evolve over time?",
+   back:"1950s: Rule-based systems & perceptrons\n1980s: Neural networks + backpropagation\n1990s: SVMs & decision trees\n2012: Deep learning breakthrough (AlexNet)\n2017: Transformer architecture invented\n2020+: Foundation models (GPT-3, BERT)\n2022+: Large multimodal models (GPT-4, Gemini, Claude)",
+   gradient:"linear-gradient(135deg,#1a0533,#2d1060,#1a0533)", glow:"#a855f7"},
+
+  {id:3,  category:"FUNDAMENTALS", icon:"⬡", tag:"How It Learns",
+   front:"How does an AI Model learn from data?",
+   back:"Training loop:\n1. Feed data into the model\n2. Model makes a prediction\n3. Compare prediction to truth — compute loss\n4. Backpropagate the error through all layers\n5. Adjust weights via gradient descent\n\nThis repeats millions of times until loss is minimised.",
+   gradient:"linear-gradient(135deg,#0d2818,#1a5c34,#0d2818)", glow:"#00ff88"},
+
+  {id:4,  category:"FUNDAMENTALS", icon:"⬢", tag:"Key Terms",
+   front:"What are Parameters, Weights & Biases?",
+   back:"Parameters = all learnable numbers inside a model.\n\nWeights — connection strengths between neurons, scaled during training.\nBiases — offset values that shift activation thresholds.\n\nGPT-4 has ~1.8 trillion parameters. More params = more capacity to learn complex patterns.",
+   gradient:"linear-gradient(135deg,#1a1a0d,#4a4a00,#1a1a0d)", glow:"#ffdd00"},
+
+  {id:5,  category:"ARCHITECTURE", icon:"∿", tag:"Neural Nets",
+   front:"What is a Neural Network?",
+   back:"Layers of interconnected nodes (neurons) loosely inspired by the brain.\n\nInput Layer — receives raw data\nHidden Layers — extract increasingly abstract features\nOutput Layer — produces the final prediction\n\nDeeper networks = more abstract, powerful representations.",
+   gradient:"linear-gradient(135deg,#1a0a0a,#4a1010,#1a0a0a)", glow:"#ff4444"},
+
+  {id:6,  category:"ARCHITECTURE", icon:"⚟", tag:"Breakthrough",
+   front:"What is the Transformer architecture?",
+   back:"Introduced in 'Attention Is All You Need' (2017). Key innovation: Self-Attention — every token attends to every other token simultaneously.\n\nThis replaced sequential RNNs with parallel computation, enabling training on massive datasets. Powers all modern LLMs: GPT, Claude, Gemini, Llama.",
+   gradient:"linear-gradient(135deg,#001a1a,#004444,#001a1a)", glow:"#00ffff"},
+
+  {id:7,  category:"ARCHITECTURE", icon:"⌖", tag:"Mechanism",
+   front:"What is the Attention mechanism?",
+   back:"Lets the model dynamically focus on relevant parts of the input when generating each token.\n\nQuery × Key → attention scores → softmax → weight the Values.\n\nMulti-Head Attention runs several attention operations in parallel, capturing different relationships at once.",
+   gradient:"linear-gradient(135deg,#0a001a,#200050,#0a001a)", glow:"#8855ff"},
+
+  {id:8,  category:"ARCHITECTURE", icon:"⊕", tag:"Model Types",
+   front:"What are the main types of AI Models?",
+   back:"• Language Models (LLMs) — text generation & reasoning\n• Vision Models (CNN, ViT) — image classification & detection\n• Diffusion Models — image/audio/video generation\n• Reinforcement Learning — decision-making agents\n• Multimodal Models — text + image + audio combined\n• Embedding Models — semantic vector representations",
+   gradient:"linear-gradient(135deg,#001a0a,#003322,#001a0a)", glow:"#00ee77"},
+
+  {id:9,  category:"TRAINING", icon:"⟁", tag:"Process",
+   front:"What are the stages of LLM training?",
+   back:"1. Pre-training — predict the next token on trillions of tokens; learns world knowledge\n2. Supervised Fine-Tuning (SFT) — train on curated instruction/response pairs\n3. RLHF — human feedback trains a reward model; PPO optimises the LLM\n4. Optional: DPO, Constitutional AI (Anthropic), RLAIF",
+   gradient:"linear-gradient(135deg,#1a0f00,#4a2800,#1a0f00)", glow:"#ff9900"},
+
+  {id:10, category:"TRAINING", icon:"◬", tag:"Concept",
+   front:"What is a Token?",
+   back:"The basic unit of text an LLM processes — roughly 3–4 characters on average.\n\n'unhappiness' → ['un','hap','pi','ness']\n\nContext Window = max tokens the model can see at once.\nGPT-4: 128k tokens · Claude 3: 200k tokens.\n\nBeyond the window, information is forgotten.",
+   gradient:"linear-gradient(135deg,#1a001a,#3d0040,#1a001a)", glow:"#ff00ff"},
+
+  {id:11, category:"TRAINING", icon:"⟳", tag:"Technique",
+   front:"What is Fine-Tuning?",
+   back:"Adapting a pre-trained model to a specific task by continuing training on a smaller, task-specific dataset.\n\nTypes:\n• Full fine-tuning — update all weights (expensive)\n• LoRA / QLoRA — train low-rank adapter matrices only (efficient)\n• Prompt tuning — learn soft prompt tokens only",
+   gradient:"linear-gradient(135deg,#001a1a,#003a3a,#001a1a)", glow:"#00cccc"},
+
+  {id:12, category:"TRAINING", icon:"⬡", tag:"Alignment",
+   front:"What is RLHF?",
+   back:"Reinforcement Learning from Human Feedback — aligns model output with human preferences.\n\n1. Generate multiple model responses\n2. Human annotators rank them by quality\n3. Train a Reward Model on those rankings\n4. Use PPO (RL) to optimise the LLM to maximise reward\n\nUsed in: ChatGPT, Claude, Gemini.",
+   gradient:"linear-gradient(135deg,#0a1a00,#1e4400,#0a1a00)", glow:"#66ff00"},
+
+  {id:13, category:"INFERENCE", icon:"△", tag:"Generation",
+   front:"How does an LLM generate text?",
+   back:"Autoregressive generation — predict one token at a time, feed it back as input.\n\nSampling controls creativity:\n• Greedy — always pick highest-probability token\n• Temperature — higher = more random output\n• Top-p (nucleus) — sample from top cumulative probability mass\n• Top-k — sample from only the top-k tokens",
+   gradient:"linear-gradient(135deg,#1a0800,#3a1500,#1a0800)", glow:"#ff6600"},
+
+  {id:14, category:"INFERENCE", icon:"⚖", tag:"Key Concept",
+   front:"What is a Context Window & System Prompt?",
+   back:"System Prompt: Instructions prepended before user input — defines the model's persona, rules, and constraints.\n\nContext Window: Total tokens visible to the model at once — includes system prompt + conversation history + retrieved documents.\n\nBeyond the window, information is forgotten by default.",
+   gradient:"linear-gradient(135deg,#00001a,#000044,#00001a)", glow:"#4488ff"},
+
+  {id:15, category:"INFERENCE", icon:"◎", tag:"Technique",
+   front:"What is Prompt Engineering?",
+   back:"Crafting inputs to elicit better outputs from LLMs.\n\n• Zero-shot — just ask directly\n• Few-shot — provide worked examples\n• Chain-of-Thought — 'think step by step'\n• ReAct — reason + act with tools\n• Role prompting — assign a persona\n• Self-consistency — sample multiple times, majority vote",
+   gradient:"linear-gradient(135deg,#1a001a,#2a0044,#1a001a)", glow:"#cc44ff"},
+
+  {id:16, category:"EVALUATION", icon:"◈", tag:"Benchmarks",
+   front:"How are AI Models evaluated?",
+   back:"Common benchmarks:\n• MMLU — 57-subject academic knowledge\n• HumanEval — coding ability\n• HellaSwag — commonsense reasoning\n• GSM8K — grade-school math\n• MT-Bench — multi-turn instruction following\n• Chatbot Arena — human preference Elo rating\n\nNo single benchmark captures the full picture.",
+   gradient:"linear-gradient(135deg,#0f2027,#1a3a4a,#0f2027)", glow:"#00d4ff"},
+
+  {id:17, category:"EVALUATION", icon:"◉", tag:"Failure Mode",
+   front:"What are Hallucinations in AI Models?",
+   back:"When a model confidently generates factually incorrect or fabricated information.\n\nCauses: next-token prediction doesn't verify truth; noisy training data; out-of-distribution queries.\n\nMitigations: RAG, tool use, self-consistency, calibrated uncertainty, RLHF on factuality.",
+   gradient:"linear-gradient(135deg,#1a0a0a,#4a1515,#1a0a0a)", glow:"#ff4444"},
+
+  {id:18, category:"LANDSCAPE", icon:"⬡", tag:"Key Players",
+   front:"Who are the major AI Model providers?",
+   back:"Frontier Labs:\n• OpenAI — GPT-4o, o1, o3\n• Anthropic — Claude 3.5 Sonnet / Opus\n• Google DeepMind — Gemini 1.5 Pro / Flash\n• Meta — Llama 3.1 (open weights)\n• Mistral — Mistral Large (open + API)\n• xAI — Grok 2\n• Cohere — Command R+ (enterprise focus)",
+   gradient:"linear-gradient(135deg,#001a1a,#004444,#001a1a)", glow:"#00cccc"},
+
+  {id:19, category:"LANDSCAPE", icon:"⚟", tag:"Comparison",
+   front:"Open-source vs Closed AI Models?",
+   back:"Open-source (Llama, Mistral, Phi):\n✓ Inspect weights · self-host · customise freely · no API cost\n✗ Require own compute · lag behind frontier performance\n\nClosed/API (GPT-4, Claude, Gemini):\n✓ Best-in-class performance · easy API access\n✗ Black box · usage costs · data privacy concerns",
+   gradient:"linear-gradient(135deg,#0a1a00,#1e3a00,#0a1a00)", glow:"#66ff00"},
+
+  {id:20, category:"LANDSCAPE", icon:"⌖", tag:"Future",
+   front:"What comes after current LLMs?",
+   back:"Key trends shaping the next era:\n• Multimodal — text + image + audio + video natively\n• Long context — millions of tokens (Gemini 1.5: 1M+)\n• Reasoning models — o1/o3 think before answering\n• Agentic AI — models use tools, browse, code autonomously\n• On-device models — Phi-3, Gemma running locally\n• Test-time compute scaling — more inference = smarter answers",
+   gradient:"linear-gradient(135deg,#0a001a,#200050,#0a001a)", glow:"#8855ff"}
+];
+
+var CAT_META = {
+  FUNDAMENTALS: {color:"#00d4ff", label:"Fundamentals"},
+  ARCHITECTURE:  {color:"#00ff88", label:"Architecture"},
+  TRAINING:      {color:"#ff9900", label:"Training"},
+  INFERENCE:     {color:"#cc44ff", label:"Inference"},
+  EVALUATION:    {color:"#ff4444", label:"Evaluation"},
+  LANDSCAPE:     {color:"#66ff00", label:"Landscape"}
+};
+
+/* ── Fisher-Yates ── */
+function shuffle(arr){
+  var a=[].concat(arr);
+  for(var i=a.length-1;i>0;i--){
+    var j=Math.floor(Math.random()*(i+1));
+    var t=a[i];a[i]=a[j];a[j]=t;
+  }
+  return a;
+}
+
+function fmt(s){return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
+
+/* ── Session persistence ── */
+var SK="aimodels_session_v1";
+function loadSess(){
+  try{
+    var raw=localStorage.getItem(SK);
+    if(!raw)return null;
+    var d=JSON.parse(raw);
+    return{
+      bookmarks:new Set(d.bookmarks||[]),
+      ratings:d.ratings||{},
+      seen:new Set(d.seen||[]),
+      streak:d.streak||0,
+      timer:d.timer||0
+    };
+  }catch(e){return null;}
+}
+function saveSess(){
+  try{
+    localStorage.setItem(SK,JSON.stringify({
+      bookmarks:[].concat(Array.from(state.bookmarks)),
+      ratings:state.ratings,
+      seen:[].concat(Array.from(state.seen)),
+      streak:state.streak,
+      timer:state.timer
+    }));
+  }catch(e){}
+}
+
+/* ════════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════════ */
+var saved=loadSess()||{};
+var state={
+  deck:[].concat(ALL_CARDS),
+  idx:0,
+  flipped:false,
+  animKey:0,
+  bookmarks:saved.bookmarks||new Set(),
+  ratings:saved.ratings||{},
+  filter:"ALL",
+  search:"",
+  shuffled:false,
+  showStats:false,
+  showSearch:false,
+  showConfirm:false,
+  streak:saved.streak||0,
+  timer:saved.timer||0,
+  timerOn:false,
+  seen:saved.seen||new Set(),
+  deckComplete:false
+};
+
+/* ── Computed ── */
+function getFiltered(){
+  return state.deck.filter(function(c){
+    var mCat=
+      state.filter==="ALL"       ? true :
+      state.filter==="BOOKMARKS" ? state.bookmarks.has(c.id) :
+      state.filter==="HARD"      ? state.ratings[c.id]==="hard" :
+      c.category===state.filter;
+    var mS=state.search.trim()===""?true:
+      c.front.toLowerCase().includes(state.search.toLowerCase())||
+      c.back.toLowerCase().includes(state.search.toLowerCase());
+    return mCat&&mS;
+  });
+}
+
+function safeIdx(deck){return Math.min(state.idx,Math.max(deck.length-1,0));}
+function currentCard(){
+  var d=getFiltered();
+  return d[safeIdx(d)]||ALL_CARDS[0];
+}
+
+/* ════════════════════════════════════════════════
+   PERSISTENCE
+════════════════════════════════════════════════ */
+function persist(){saveSess();}
+
+/* ════════════════════════════════════════════════
+   TIMER
+════════════════════════════════════════════════ */
+var timerInterval=null;
+function startTimer(){
+  if(timerInterval)return;
+  timerInterval=setInterval(function(){
+    state.timer++;
+    persist();
+    renderToolbar();
+  },1000);
+}
+function stopTimer(){clearInterval(timerInterval);timerInterval=null;}
+
+/* ════════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════════ */
+var toastTO=null;
+function showToast(msg,color){
+  var el=document.getElementById('toast');
+  if(!el)return;
+  clearTimeout(toastTO);
+  el.textContent=msg;
+  el.style.color=color;
+  el.style.background='rgba(10,10,20,.96)';
+  el.style.border='1px solid '+color+'40';
+  el.style.boxShadow='0 0 20px '+color+'28';
+  el.style.display='block';
+  el.className='toast';
+  toastTO=setTimeout(function(){
+    el.className='toast out';
+    setTimeout(function(){el.style.display='none';},320);
+  },1800);
+}
+
+/* ════════════════════════════════════════════════
+   CONFETTI
+════════════════════════════════════════════════ */
+function fireConfetti(color){
+  var c=document.getElementById('confetti-container');
+  if(!c)return;
+  for(var i=0;i<28;i++){
+    (function(i){
+      var p=document.createElement('div');
+      p.className='confetti';
+      p.style.left=Math.random()*100+'%';
+      p.style.top='15%';
+      p.style.width=p.style.height=(6+Math.random()*6)+'px';
+      p.style.background=color;
+      p.style.borderRadius=Math.random()>.5?'50%':'3px';
+      p.style.animationDelay=(Math.random()*.35)+'s';
+      c.appendChild(p);
+      setTimeout(function(){p.remove();},1400);
+    })(i);
+  }
+}
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+function goTo(i,deckLen){
+  if(!deckLen)return;
+  var clamped=((i%deckLen)+deckLen)%deckLen;
+  state.flipped=false;
+  setTimeout(function(){
+    state.idx=clamped;
+    state.animKey++;
+    render();
+  },180);
+}
+function goNext(){
+  var d=getFiltered();
+  state.seen.add(currentCard().id);
+  persist();
+  checkComplete();
+  goTo(safeIdx(d)+1,d.length);
+}
+function goPrev(){
+  var d=getFiltered();
+  goTo(safeIdx(d)-1,d.length);
+}
+function checkComplete(){
+  if(state.seen.size===ALL_CARDS.length&&!state.deckComplete){
+    state.deckComplete=true;
+    fireConfetti('#00ff88');
+    showToast('🎉 Deck complete! All 20 cards seen!','#00ff88');
+  }
+}
+
+/* ════════════════════════════════════════════════
+   BOOKMARKS
+════════════════════════════════════════════════ */
+function toggleBookmark(id){
+  if(state.bookmarks.has(id)){state.bookmarks.delete(id);showToast('Bookmark removed','#888');}
+  else{state.bookmarks.add(id);showToast('Bookmarked ✦','#ffdd00');}
+  persist();render();
+}
+
+/* ════════════════════════════════════════════════
+   RATING
+════════════════════════════════════════════════ */
+function handleRate(level){
+  var d=getFiltered();
+  var si=safeIdx(d);
+  var card=d[si];
+  state.ratings[card.id]=level;
+  state.seen.add(card.id);
+  persist();
+  if(level==='easy'){
+    state.streak++;
+    persist();
+    if(state.streak%5===0)fireConfetti(card.glow);
+    showToast('Easy ✓','#00ff88');
+  }else if(level==='medium'){
+    showToast('Getting there ◎','#ffdd00');
+  }else{
+    state.streak=0;
+    persist();
+    showToast('Mark for review ✕','#ff4444');
+  }
+  checkComplete();
+  setTimeout(function(){goTo(si+1,d.length);},400);
+}
+
+/* ════════════════════════════════════════════════
+   SHUFFLE
+════════════════════════════════════════════════ */
+function toggleShuffle(){
+  state.deck=state.shuffled?[].concat(ALL_CARDS):shuffle(ALL_CARDS);
+  state.shuffled=!state.shuffled;
+  state.idx=0;state.flipped=false;
+  showToast(state.shuffled?'Deck shuffled ⟳':'Order restored','#f0b429');
+  render();
+}
+
+/* ════════════════════════════════════════════════
+   RESET
+════════════════════════════════════════════════ */
+function doReset(){
+  state.seen=new Set();state.ratings={};state.bookmarks=new Set();
+  state.streak=0;state.timer=0;state.timerOn=false;
+  state.idx=0;state.flipped=false;
+  state.deck=[].concat(ALL_CARDS);state.shuffled=false;
+  state.deckComplete=false;state.showConfirm=false;
+  stopTimer();
+  localStorage.removeItem(SK);
+  showToast('Session reset','#888');
+  render();
+}
+
+/* ════════════════════════════════════════════════
+   PARTICLES
+════════════════════════════════════════════════ */
+(function(){
+  var pc=document.getElementById('particles');
+  if(!pc)return;
+  for(var i=0;i<16;i++){
+    var p=document.createElement('div');
+    var sz=(1+Math.random()*2.5)+'px';
+    p.style.cssText='position:absolute;border-radius:50%;width:'+sz+';height:'+sz+
+      ';left:'+Math.random()*100+'%;bottom:-10px;'+
+      '--dx:'+(Math.random()-.5)*200+'px;'+
+      'animation:floatP '+(7+Math.random()*6)+'s linear '+(Math.random()*5)+'s infinite;';
+    pc.appendChild(p);
+    p._node=p;
+  }
+})();
+
+function updateParticleColor(glow){
+  var pc=document.getElementById('particles');
+  if(!pc)return;
+  var ps=pc.querySelectorAll('div');
+  ps.forEach(function(p){
+    p.style.background=glow;
+    p.style.boxShadow='0 0 5px '+glow;
+  });
+}
+
+/* ════════════════════════════════════════════════
+   AMBIENT ORB
+════════════════════════════════════════════════ */
+function updateOrb(glow){
+  var orb=document.getElementById('amb-orb');
+  if(!orb)return;
+  orb.style.background='radial-gradient(circle,'+glow+'12 0%,transparent 70%)';
+}
+
+/* ════════════════════════════════════════════════
+   RENDER FUNCTIONS
+════════════════════════════════════════════════ */
+
+/* ── Toolbar ── */
+function renderToolbar(){
+  var tb=document.getElementById('toolbar');
+  if(!tb)return;
+  var card=currentCard();
+  var btns=[
+    {label:state.showSearch?'⌕ Hide':'⌕ Search', active:state.showSearch, action:'search'},
+    {label:state.shuffled?'⟳ Ordered':'⟳ Shuffle', active:state.shuffled, action:'shuffle'},
+    {label:'◈ Stats', active:state.showStats, action:'stats'},
+    {label:state.timerOn?'⏱ '+fmt(state.timer):'⏱ Timer', active:state.timerOn, action:'timer'},
+    {label:'↺ Reset', active:false, action:'reset'}
+  ];
+  tb.innerHTML='';
+  btns.forEach(function(b){
+    var btn=document.createElement('button');
+    btn.textContent=b.label;
+    btn.style.cssText='background:'+(b.active?card.glow+'18':'rgba(255,255,255,.04)')+
+      ';border:1px solid '+(b.active?card.glow+'40':'rgba(255,255,255,.08)')+
+      ';color:'+(b.active?card.glow:'rgba(255,255,255,.45)')+
+      ';padding:7px 13px;border-radius:9px;cursor:pointer;'+
+      'font-size:11px;font-family:var(--mono);letter-spacing:.08em;transition:all .2s;';
+    btn.addEventListener('click',function(){
+      if(b.action==='search'){state.showSearch=!state.showSearch;if(!state.showSearch){state.search='';state.idx=0;state.flipped=false;}render();}
+      else if(b.action==='shuffle')toggleShuffle();
+      else if(b.action==='stats'){state.showStats=!state.showStats;render();}
+      else if(b.action==='timer'){
+        state.timerOn=!state.timerOn;
+        if(state.timerOn)startTimer();else stopTimer();
+        render();
+      }
+      else if(b.action==='reset'){state.showConfirm=true;renderConfirm();}
+    });
+    addHoverClass(btn);
+    tb.appendChild(btn);
+  });
+}
+
+/* ── Search ── */
+function renderSearch(){
+  var wrap=document.getElementById('search-wrap');
+  var inp=document.getElementById('search-input');
+  var clr=document.getElementById('search-clear');
+  var cnt=document.getElementById('search-count');
+  if(!wrap)return;
+  wrap.style.display=state.showSearch?'block':'none';
+  if(state.showSearch){
+    inp.value=state.search;
+    clr.style.display=state.search?'block':'none';
+    if(state.search){
+      var d=getFiltered();
+      cnt.textContent=d.length+'/'+ALL_CARDS.length;
+      cnt.style.display='block';
+      cnt.style.right=state.search?'42px':'10px';
+    }else{
+      cnt.style.display='none';
+    }
+  }
+}
+
+/* ── Stats Panel ── */
+function renderStats(){
+  var panel=document.getElementById('stats-panel');
+  if(!panel)return;
+  if(!state.showStats){panel.style.display='none';return;}
+  panel.style.display='block';
+  var easy=0,med=0,hard=0;
+  Object.values(state.ratings).forEach(function(v){
+    if(v==='easy')easy++;else if(v==='medium')med++;else hard++;
+  });
+  var rated=easy+med+hard;
+  var pct=Math.round(state.seen.size/ALL_CARDS.length*100);
+  var card=currentCard();
+
+  var catStats=Object.entries(CAT_META).map(function(entry){
+    var cat=entry[0],meta=entry[1];
+    return{
+      cat:cat,meta:meta,
+      total:ALL_CARDS.filter(function(c){return c.category===cat;}).length,
+      seen:ALL_CARDS.filter(function(c){return c.category===cat&&state.seen.has(c.id);}).length
+    };
+  });
+
+  panel.innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">'+
+      '<span style="font-size:11px;letter-spacing:.2em;color:rgba(255,255,255,.4);text-transform:uppercase;font-family:var(--mono);">Session Stats</span>'+
+      '<div style="display:flex;align-items:center;gap:12px;">'+
+        '<span style="font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono);">⏱ '+fmt(state.timer)+'</span>'+
+        '<span class="streak-num" style="font-size:18px;">🔥 '+state.streak+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:14px;">'+
+      [
+        {l:'Seen',val:state.seen.size,c:'#00d4ff'},
+        {l:'Easy',val:easy,c:'#00ff88'},
+        {l:'Medium',val:med,c:'#ffdd00'},
+        {l:'Hard',val:hard,c:'#ff4444'},
+        {l:'Rated',val:rated,c:'#a855f7'}
+      ].map(function(s){
+        return '<div style="background:rgba(255,255,255,.03);border-radius:10px;padding:10px 6px;text-align:center;border:1px solid '+s.c+'20;">'+
+          '<div style="font-size:20px;font-weight:800;color:'+s.c+';">'+s.val+'</div>'+
+          '<div style="font-size:8px;color:rgba(255,255,255,.3);letter-spacing:.15em;text-transform:uppercase;font-family:var(--mono);margin-top:2px;">'+s.l+'</div>'+
+        '</div>';
+      }).join('')+
+    '</div>'+
+    (rated>0?
+      '<div style="height:5px;border-radius:3px;overflow:hidden;display:flex;gap:2px;margin-bottom:6px;">'+
+        (easy>0?'<div style="flex:'+easy+';background:#00ff88;border-radius:3px;transition:flex .4s;"></div>':'')+
+        (med>0?'<div style="flex:'+med+';background:#ffdd00;border-radius:3px;transition:flex .4s;"></div>':'')+
+        (hard>0?'<div style="flex:'+hard+';background:#ff4444;border-radius:3px;transition:flex .4s;"></div>':'')+
+      '</div>':'')+
+    '<div style="margin-bottom:14px;">'+
+      '<div style="display:flex;justify-content:space-between;margin-bottom:5px;">'+
+        '<span style="font-size:9px;color:rgba(255,255,255,.25);font-family:var(--mono);letter-spacing:.15em;">OVERALL PROGRESS</span>'+
+        '<span style="font-size:9px;color:'+card.glow+';font-family:var(--mono);font-weight:700;">'+pct+'% · '+state.seen.size+'/'+ALL_CARDS.length+'</span>'+
+      '</div>'+
+      '<div style="height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;">'+
+        '<div style="height:100%;width:'+pct+'%;background:linear-gradient(90deg,'+card.glow+'88,'+card.glow+');transition:width .5s ease;border-radius:3px;"></div>'+
+      '</div>'+
+    '</div>'+
+    '<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:12px;">'+
+      '<div style="font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.2em;font-family:var(--mono);text-transform:uppercase;margin-bottom:8px;">BY CATEGORY</div>'+
+      catStats.map(function(cs){
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">'+
+          '<div style="width:6px;height:6px;border-radius:50%;background:'+cs.meta.color+';flex-shrink:0;"></div>'+
+          '<span style="font-size:8px;color:rgba(255,255,255,.3);font-family:var(--mono);width:90px;text-transform:uppercase;letter-spacing:.1em;">'+cs.cat+'</span>'+
+          '<div style="flex:1;height:3px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;">'+
+            '<div style="height:100%;width:'+(cs.total>0?cs.seen/cs.total*100:0)+'%;background:'+cs.meta.color+';transition:width .5s;border-radius:2px;"></div>'+
+          '</div>'+
+          '<span style="font-size:8px;color:rgba(255,255,255,.25);font-family:var(--mono);width:28px;text-align:right;">'+cs.seen+'/'+cs.total+'</span>'+
+        '</div>';
+      }).join('')+
+    '</div>';
+}
+
+/* ── Filter bar ── */
+function renderFilterBar(){
+  var fb=document.getElementById('filter-bar');
+  if(!fb)return;
+  var filters=['ALL','BOOKMARKS','HARD'].concat(Object.keys(CAT_META));
+  fb.innerHTML='';
+  filters.forEach(function(f){
+    var isActive=state.filter===f;
+    var color=f==='ALL'?'#888':f==='BOOKMARKS'?'#ffdd00':f==='HARD'?'#ff4444':CAT_META[f].color;
+    var count=f==='ALL'?ALL_CARDS.length:
+      f==='BOOKMARKS'?state.bookmarks.size:
+      f==='HARD'?Object.values(state.ratings).filter(function(v){return v==='hard';}).length:
+      ALL_CARDS.filter(function(c){return c.category===f;}).length;
+    var lbl=f==='BOOKMARKS'?'✦ '+f:f==='HARD'?'✕ '+f:f;
+    var btn=document.createElement('button');
+    btn.textContent=lbl+(count>0?' ('+count+')':'');
+    btn.className='tag-pill';
+    btn.style.cssText='background:'+(isActive?color+'20':'rgba(255,255,255,.03)')+
+      ';border:1px solid '+(isActive?color+'50':'rgba(255,255,255,.07)')+
+      ';color:'+(isActive?color:'rgba(255,255,255,.35)')+
+      ';padding:5px 11px;border-radius:20px;cursor:pointer;'+
+      'font-size:9px;font-family:var(--mono);letter-spacing:.15em;text-transform:uppercase;transition:all .2s;';
+    btn.addEventListener('click',function(){
+      state.filter=f;state.idx=0;state.flipped=false;render();
+    });
+    addHoverClass(btn);
+    fb.appendChild(btn);
+  });
+}
+
+/* ── Progress row ── */
+function renderProgress(){
+  var d=getFiltered();
+  var si=safeIdx(d);
+  var card=d[si]||ALL_CARDS[0];
+  var meta=CAT_META[card.category];
+
+  var catLabel=document.getElementById('cat-label');
+  if(catLabel){
+    catLabel.innerHTML=
+      '<div style="width:5px;height:5px;border-radius:50%;background:'+meta.color+
+      ';box-shadow:0 0 6px '+meta.color+';"></div>'+
+      '<span style="font-size:9px;letter-spacing:.22em;color:'+meta.color+
+      ';text-transform:uppercase;font-family:var(--mono);">'+card.category+'</span>';
+  }
+  var posLabel=document.getElementById('pos-label');
+  if(posLabel){
+    posLabel.textContent=String(si+1).padStart(2,'0')+' / '+String(d.length).padStart(2,'0')+
+      (d.length<ALL_CARDS.length?' (filtered)':'');
+  }
+  var pb=document.getElementById('progress-bar');
+  if(pb){
+    pb.style.width=((si+1)/Math.max(d.length,1)*100)+'%';
+    pb.style.background='linear-gradient(90deg,'+card.glow+'88,'+card.glow+')';
+    pb.style.boxShadow='0 0 8px '+card.glow;
+  }
+}
+
+/* ── Card area ── */
+function renderCard(){
+  var area=document.getElementById('card-area');
+  if(!area)return;
+  var d=getFiltered();
+  var si=safeIdx(d);
+
+  if(d.length===0){
+    area.innerHTML=
+      '<div style="text-align:center;padding:50px 20px;background:rgba(255,255,255,.02);'+
+      'border:1px solid rgba(255,255,255,.06);border-radius:22px;">'+
+      '<div style="font-size:28px;margin-bottom:12px;">◎</div>'+
+      '<div style="color:rgba(255,255,255,.3);font-family:var(--mono);font-size:12px;margin-bottom:18px;line-height:1.6;">No cards match this filter.</div>'+
+      '<button id="escape-btn" style="background:rgba(122,162,247,.18);border:1px solid rgba(122,162,247,.4);'+
+      'color:#7aa2f7;padding:9px 22px;border-radius:10px;cursor:pointer;font-family:var(--ff);font-size:12px;font-weight:700;transition:all .2s;">'+
+      '← Show All Cards</button>'+
+      '</div>';
+    var eb=document.getElementById('escape-btn');
+    if(eb)eb.addEventListener('click',function(){state.filter='ALL';state.idx=0;state.flipped=false;render();});
+    return;
+  }
+
+  var card=d[si];
+  if(!card)return;
+
+  /* update ambient */
+  updateOrb(card.glow);
+  updateParticleColor(card.glow);
+  if(window.setCursorGlow)setCursorGlow(card.glow);
+  var ta=document.getElementById('title-accent');
+  if(ta){ta.style.color=card.glow;ta.style.textShadow='0 0 40px '+card.glow+'50';}
+  var orb=document.getElementById('amb-orb');
+  if(orb)orb.style.background='radial-gradient(circle,'+card.glow+'12 0%,transparent 70%)';
+
+  var pip=document.getElementById('pip');
+  if(pip)pip.style.background=card.glow;
+
+  var flippedClass=state.flipped?' flipped':'';
+  var ratingBadge=state.ratings[card.id]?
+    '<div style="position:absolute;top:14px;left:16px;font-size:8px;font-family:var(--mono);'+
+    'letter-spacing:.2em;text-transform:uppercase;'+
+    'color:'+(state.ratings[card.id]==='easy'?'#00ff88':state.ratings[card.id]==='medium'?'#ffdd00':'#ff4444')+
+    ';background:rgba(0,0,0,.45);padding:3px 8px;border-radius:6px;">'+
+    state.ratings[card.id]+'</div>':
+    '';
+  var bmIcon=state.bookmarks.has(card.id)?
+    '<div style="position:absolute;top:14px;right:16px;font-size:14px;color:#ffdd00;text-shadow:0 0 12px #ffdd00;">✦</div>':'';
+
+  area.innerHTML=
+    '<div class="card-scene" id="card-scene-'+state.animKey+'" style="width:100%;margin-bottom:14px;">'+
+      '<div class="flip-wrap'+flippedClass+'" id="flip-wrap">'+
+
+        /* FRONT */
+        '<div class="face" style="background:'+card.gradient+
+          ';border:1px solid '+card.glow+'20'+
+          ';box-shadow:0 0 0 1px '+card.glow+'10,0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05)'+
+          ';padding:48px 44px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;">'+
+          /* tag pill */
+          '<div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);'+
+            'background:'+card.glow+'18;border:1px solid '+card.glow+'35;border-radius:20px;'+
+            'padding:3px 10px;font-size:8px;color:'+card.glow+';font-family:var(--mono);'+
+            'letter-spacing:.2em;text-transform:uppercase;white-space:nowrap;">'+card.tag+'</div>'+
+          ratingBadge+bmIcon+
+          '<div style="font-size:42px;color:'+card.glow+';margin-bottom:18px;'+
+            'text-shadow:0 0 28px '+card.glow+';animation:pulse 3s ease-in-out infinite;">'+card.icon+'</div>'+
+          '<div style="font-size:clamp(16px,3vw,22px);color:#fff;text-align:center;'+
+            'line-height:1.35;font-weight:700;letter-spacing:-.01em;'+
+            'text-shadow:0 2px 16px rgba(0,0,0,.5);">'+card.front+'</div>'+
+          '<div style="position:absolute;bottom:18px;display:flex;align-items:center;gap:6px;">'+
+            '<div style="width:14px;height:1px;background:'+card.glow+'40;"></div>'+
+            '<span style="font-size:8px;letter-spacing:.22em;color:'+card.glow+'55;font-family:var(--mono);text-transform:uppercase;">tap · swipe up</span>'+
+            '<div style="width:14px;height:1px;background:'+card.glow+'40;"></div>'+
+          '</div>'+
+          '<div style="position:absolute;inset:0;border-radius:22px;pointer-events:none;'+
+            'background:radial-gradient(ellipse at 50% 0%,'+card.glow+'07 0%,transparent 60%);"></div>'+
+        '</div>'+
+
+        /* BACK */
+        '<div class="back-face" style="background:'+card.gradient+
+          ';border:1px solid '+card.glow+'45'+
+          ';box-shadow:0 0 0 1px '+card.glow+'20,0 24px 60px rgba(0,0,0,.7),0 0 50px '+card.glow+'12,inset 0 1px 0 rgba(255,255,255,.07)'+
+          ';overflow:hidden;padding:0;display:flex;flex-direction:column;">'+
+          /* top label */
+          '<div style="padding:20px 40px 12px;flex-shrink:0;">'+
+            '<div style="font-size:8px;letter-spacing:.3em;color:'+card.glow+
+              ';font-family:var(--mono);text-transform:uppercase;">▸ Answer</div>'+
+            '<div style="margin-top:8px;height:1px;'+
+              'background:linear-gradient(90deg,'+card.glow+'50,transparent);"></div>'+
+          '</div>'+
+          /* answer text — centered in remaining space above rating strip */
+          '<div style="flex:1;display:flex;align-items:center;justify-content:center;'+
+            'padding:0 40px;overflow-y:auto;">'+
+            '<div style="font-size:clamp(14px,2vw,16px);color:rgba(255,255,255,.9);'+
+              'line-height:1.9;white-space:pre-line;font-family:Georgia,serif;'+
+              'font-weight:400;text-align:center;width:100%;">'+card.back+'</div>'+
+          '</div>'+
+          /* rating strip */
+          '<div style="flex-shrink:0;'+
+            'border-top:1px solid '+card.glow+'20;border-radius:0 0 22px 22px;'+
+            'background:rgba(0,0,0,.5);backdrop-filter:blur(12px);'+
+            'display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;">'+
+            '<span style="font-size:7px;color:'+card.glow+'70;font-family:var(--mono);'+
+              'letter-spacing:.2em;text-transform:uppercase;margin-right:2px;">HOW\'D IT GO?</span>'+
+            ['easy','medium','hard'].map(function(level,i){
+              var labels=['Easy','Medium','Hard'];
+              var colors=['#00ff88','#ffdd00','#ff4444'];
+              var keys=['1','2','3'];
+              return '<button class="rating-btn" data-level="'+level+'" style="background:'+colors[i]+'15;border:1px solid '+colors[i]+'40;'+
+                'color:'+colors[i]+';padding:6px 12px;border-radius:8px;font-size:10px;font-family:var(--ff);font-weight:700;">'+
+                labels[i]+' <span class="kbd">'+keys[i]+'</span></button>';
+            }).join('')+
+          '</div>'+
+          '<div style="position:absolute;inset:0;border-radius:22px;pointer-events:none;'+
+            'background:radial-gradient(ellipse at 50% 100%,'+card.glow+'09 0%,transparent 60%);"></div>'+
+        '</div>'+
+      '</div>'+
+    '</div>';
+
+  /* Bind flip click */
+  var scene=document.getElementById('card-scene-'+state.animKey);
+  if(scene){
+    scene.addEventListener('click',function(e){
+      if(e.target.classList.contains('rating-btn')||e.target.closest&&e.target.closest('.rating-btn'))return;
+      state.flipped=!state.flipped;
+      var fw=document.getElementById('flip-wrap');
+      if(fw){fw.className='flip-wrap'+(state.flipped?' flipped':'');}
+    });
+    addHoverClass(scene);
+  }
+
+  /* Bind rating buttons */
+  area.querySelectorAll('.rating-btn').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      handleRate(this.dataset.level);
+    });
+    addHoverClass(btn);
+  });
+}
+
+/* ── Nav controls ── */
+function renderNavControls(){
+  var nc=document.getElementById('nav-controls');
+  if(!nc)return;
+  var card=currentCard();
+  nc.innerHTML=
+    '<button class="btn-nav" id="btn-prev" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);'+
+      'color:rgba(255,255,255,.45);padding:12px 18px;border-radius:11px;cursor:pointer;font-size:12px;font-family:var(--ff);letter-spacing:.04em;">'+
+      '← <span class="kbd">P</span></button>'+
+    '<button class="btn-flip" id="btn-flip" style="background:linear-gradient(135deg,'+card.glow+'cc,'+card.glow+'88);'+
+      'border:none;color:#000;padding:12px 30px;border-radius:11px;cursor:pointer;font-size:13px;font-weight:700;'+
+      'font-family:var(--ff);letter-spacing:.07em;box-shadow:0 4px 20px '+card.glow+'35;">'+
+      (state.flipped?'◈ Hide':'◈ Reveal')+' <span style="opacity:.6;font-weight:400;">Space</span></button>'+
+    '<button class="btn-nav" id="btn-bm" style="background:'+(state.bookmarks.has(card.id)?'rgba(255,221,0,.08)':'rgba(255,255,255,.04)')+
+      ';border:1px solid '+(state.bookmarks.has(card.id)?'#ffdd0040':'rgba(255,255,255,.09)')+
+      ';color:'+(state.bookmarks.has(card.id)?'#ffdd00':'rgba(255,255,255,.35)')+
+      ';padding:12px 13px;border-radius:11px;cursor:pointer;font-size:15px;transition:all .2s;">✦</button>'+
+    '<button class="btn-nav" id="btn-next" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);'+
+      'color:rgba(255,255,255,.45);padding:12px 18px;border-radius:11px;cursor:pointer;font-size:12px;font-family:var(--ff);letter-spacing:.04em;">'+
+      '<span class="kbd">N</span> →</button>';
+
+  document.getElementById('btn-prev').addEventListener('click',goPrev);
+  document.getElementById('btn-flip').addEventListener('click',function(){
+    state.flipped=!state.flipped;
+    var fw=document.getElementById('flip-wrap');
+    if(fw){fw.className='flip-wrap'+(state.flipped?' flipped':'');}
+    renderNavControls();
+  });
+  document.getElementById('btn-bm').addEventListener('click',function(){toggleBookmark(card.id);});
+  document.getElementById('btn-next').addEventListener('click',goNext);
+
+  nc.querySelectorAll('button').forEach(addHoverClass);
+}
+
+/* ── Dot nav ── */
+function renderDotNav(){
+  var dn=document.getElementById('dot-nav');
+  if(!dn)return;
+  var d=getFiltered();
+  var si=safeIdx(d);
+  dn.innerHTML='';
+  d.forEach(function(c,i){
+    var m=CAT_META[c.category];
+    var isActive=i===si;
+    var dot=document.createElement('div');
+    dot.className='dot';
+    dot.title=c.front;
+    dot.style.cssText='width:'+(isActive?'22':'7')+'px;height:7px;border-radius:4px;'+
+      'background:'+(isActive?m.color:state.seen.has(c.id)?'rgba(255,255,255,.15)':'rgba(255,255,255,.05)')+
+      ';box-shadow:'+(isActive?'0 0 8px '+m.color:'none')+';cursor:pointer;'+
+      'transition:all .4s cubic-bezier(.34,1.56,.64,1);flex-shrink:0;';
+    (function(idx,dLen){
+      dot.addEventListener('click',function(){goTo(idx,dLen);});
+    })(i,d.length);
+    dn.appendChild(dot);
+  });
+}
+
+/* ── Keyboard hints ── */
+function renderKbdHints(){
+  var kh=document.getElementById('kbd-hints');
+  if(!kh)return;
+  var hints=[['Space','Flip'],['← →','Navigate'],['B','Bookmark'],['1-3','Rate'],['S','Search'],['T','Timer'],['Esc','Close']];
+  kh.innerHTML=hints.map(function(h){
+    return '<div style="display:flex;align-items:center;gap:4px;">'+
+      '<span class="kbd">'+h[0]+'</span>'+
+      '<span style="font-size:8px;color:rgba(255,255,255,.2);letter-spacing:.1em;font-family:var(--mono);">'+h[1]+'</span>'+
+    '</div>';
+  }).join('');
+}
+
+/* ── Confirm dialog ── */
+function renderConfirm(){
+  var ov=document.getElementById('confirm-overlay');
+  var card=currentCard();
+  var ok=document.getElementById('confirm-ok');
+  if(ok){ok.style.background=card.glow;ok.style.color=isLight(card.glow)?'#000':'#fff';}
+  ov.style.display=state.showConfirm?'flex':'none';
+}
+
+function isLight(hex){
+  hex=hex.replace('#','');
+  if(hex.length===3)hex=hex.split('').map(function(c){return c+c;}).join('');
+  var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);
+  return(r*299+g*587+b*114)/1000>155;
+}
+
+/* ── Master render ── */
+function render(){
+  renderToolbar();
+  renderSearch();
+  renderStats();
+  renderFilterBar();
+  renderProgress();
+  renderCard();
+  renderNavControls();
+  renderDotNav();
+  renderKbdHints();
+  renderConfirm();
+}
+
+/* ════════════════════════════════════════════════
+   ENHANCED SPOTLIGHT CURSOR
+════════════════════════════════════════════════ */
+(function(){
+  var dot=document.getElementById('c-dot');
+  var spl=document.getElementById('c-spotlight');
+  if(!dot)return;
+  var mx=window.innerWidth/2, my=window.innerHeight/2;
+  var glowHex='rgba(240,180,41,';
+  document.addEventListener('mousemove',function(e){
+    mx=e.clientX; my=e.clientY;
+    dot.style.left=mx+'px'; dot.style.top=my+'px';
+    if(spl){
+      spl.style.background=
+        'radial-gradient(circle 120px at '+mx+'px '+my+'px,'+
+        glowHex+'0.14) 0%,'+glowHex+'0.06) 38%,transparent 68%)';
+    }
+  });
+  document.addEventListener('mousedown',function(e){
+    document.body.classList.add('cc');
+    var r=document.createElement('div');
+    r.style.cssText='position:fixed;left:'+e.clientX+'px;top:'+e.clientY+'px;'+
+      'width:8px;height:8px;border-radius:50%;pointer-events:none;z-index:99990;'+
+      'background:rgba(240,180,41,.5);transform:translate(-50%,-50%) scale(1);'+
+      'transition:transform .55s cubic-bezier(.2,.8,.3,1),opacity .55s ease;';
+    document.body.appendChild(r);
+    requestAnimationFrame(function(){r.style.transform='translate(-50%,-50%) scale(10)';r.style.opacity='0';});
+    setTimeout(function(){r.remove();},620);
+  });
+  document.addEventListener('mouseup',function(){document.body.classList.remove('cc');});
+  function addInteractive(sel){
+    document.querySelectorAll(sel).forEach(function(el){
+      el.addEventListener('mouseenter',function(){document.body.classList.add('ch');});
+      el.addEventListener('mouseleave',function(){document.body.classList.remove('ch');});
+    });
+  }
+  addInteractive('a,button,.card-scene,.rating-btn,.dot,.tag-pill,.btn-nav,.btn-flip');
+  document.querySelectorAll('input,textarea').forEach(function(el){
+    el.addEventListener('mouseenter',function(){document.body.classList.add('ct');});
+    el.addEventListener('mouseleave',function(){document.body.classList.remove('ct');});
+  });
+  /* Dynamic re-bind for rendered cards */
+  var mo=new MutationObserver(function(){
+    addInteractive('a,button,.card-scene,.rating-btn,.dot,.tag-pill,.btn-nav,.btn-flip');
+    document.querySelectorAll('input,textarea').forEach(function(el){
+      el.addEventListener('mouseenter',function(){document.body.classList.add('ct');});
+      el.addEventListener('mouseleave',function(){document.body.classList.remove('ct');});
+    });
+  });
+  mo.observe(document.body,{childList:true,subtree:true});
+  /* Expose glow colour updater so renderCard() can tint spotlight */
+  window.setCursorGlow=function(hex){
+    glowHex=hexToRgba(hex);
+    dot.style.boxShadow='0 0 0 2px '+glowHex+'.15),0 0 14px 4px '+hex+',0 0 30px 8px '+glowHex+'.30)';
+
+  };
+  function hexToRgba(hex){
+    hex=hex.replace('#','');
+    if(hex.length===3)hex=hex.split('').map(function(c){return c+c;}).join('');
+    var r=parseInt(hex.substr(0,2),16),g=parseInt(hex.substr(2,2),16),b=parseInt(hex.substr(4,2),16);
+    return 'rgba('+r+','+g+','+b+',';
+  }
+})();
+
+function addHoverClass(el){
+  el.addEventListener('mouseenter',function(){document.body.classList.add('ch');});
+  el.addEventListener('mouseleave',function(){document.body.classList.remove('ch');});
+}
+
+/* ════════════════════════════════════════════════
+   KEYBOARD
+════════════════════════════════════════════════ */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    state.showSearch=false;state.showStats=false;state.showConfirm=false;state.search='';
+    render();return;
+  }
+  if(document.activeElement&&document.activeElement.tagName==='INPUT')return;
+  var d=getFiltered();
+  var si=safeIdx(d);
+  var card=d[si]||ALL_CARDS[0];
+  if(e.key===' '||e.key==='f'){e.preventDefault();state.flipped=!state.flipped;var fw=document.getElementById('flip-wrap');if(fw)fw.className='flip-wrap'+(state.flipped?' flipped':'');renderNavControls();}
+  if(e.key==='ArrowRight'||e.key==='n'){state.seen.add(card.id);persist();checkComplete();goTo(si+1,d.length);}
+  if(e.key==='ArrowLeft'||e.key==='p')goTo(si-1,d.length);
+  if(e.key==='b'){toggleBookmark(card.id);}
+  if(e.key==='s'){state.showSearch=!state.showSearch;if(!state.showSearch){state.search='';state.idx=0;state.flipped=false;}render();setTimeout(function(){var i=document.getElementById('search-input');if(i&&state.showSearch)i.focus();},50);}
+  if(e.key==='t'){state.timerOn=!state.timerOn;if(state.timerOn)startTimer();else stopTimer();render();}
+  if(state.flipped){
+    if(e.key==='1')handleRate('easy');
+    if(e.key==='2')handleRate('medium');
+    if(e.key==='3')handleRate('hard');
+  }
+});
+
+/* ── Search input event ── */
+document.addEventListener('input',function(e){
+  if(e.target&&e.target.id==='search-input'){
+    state.search=e.target.value;
+    state.idx=0;state.flipped=false;
+    renderSearch();renderProgress();renderCard();renderNavControls();renderDotNav();renderFilterBar();
+  }
+});
+document.addEventListener('click',function(e){
+  if(e.target&&e.target.id==='search-clear'){
+    state.search='';state.idx=0;state.flipped=false;
+    render();
+  }
+});
+
+/* ── Touch/swipe ── */
+(function(){
+  var tx=0,ty=0;
+  document.addEventListener('touchstart',function(e){
+    tx=e.touches[0].clientX;ty=e.touches[0].clientY;
+  },{passive:true});
+  document.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx;
+    var dy=e.changedTouches[0].clientY-ty;
+    var d=getFiltered();
+    var si=safeIdx(d);
+    var card=d[si]||ALL_CARDS[0];
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      if(dx<0){state.seen.add(card.id);persist();checkComplete();goTo(si+1,d.length);}
+      else goTo(si-1,d.length);
+    }else if(dy<-60&&Math.abs(dy)>Math.abs(dx)){
+      state.flipped=!state.flipped;
+      var fw=document.getElementById('flip-wrap');
+      if(fw)fw.className='flip-wrap'+(state.flipped?' flipped':'');
+      renderNavControls();
+    }
+  },{passive:true});
+})();
+
+/* ── Confirm dialog buttons ── */
+document.getElementById('confirm-cancel').addEventListener('click',function(){state.showConfirm=false;render();});
+document.getElementById('confirm-ok').addEventListener('click',doReset);
+document.getElementById('confirm-overlay').addEventListener('click',function(e){if(e.target===this){state.showConfirm=false;render();}});
+
+/* ── Back button hover ── */
+var bb=document.getElementById('back-btn');
+if(bb){
+  addHoverClass(bb);
+  bb.addEventListener('mouseenter',function(){this.style.borderColor='rgba(240,180,41,.3)';this.style.color='rgba(221,230,245,.6)';});
+  bb.addEventListener('mouseleave',function(){this.style.borderColor='rgba(255,255,255,.07)';this.style.color='rgba(221,230,245,.35)';});
+}
+
+/* ── Initial render ── */
+render();
+</script>
+</body>
+</html>
