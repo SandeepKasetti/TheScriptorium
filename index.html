@@ -1705,19 +1705,11 @@ anime({targets:'.sec-row',opacity:[0,1],translateY:[14,0],duration:700,delay:600
       easing:'easeOutExpo'
     });
   } else {
-    /* subsequent loads — use IntersectionObserver ink-reveal */
-    var io=new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if(e.isIntersecting){
-          e.target.classList.remove('ink-hidden');
-          e.target.classList.add('ink-reveal');
-          io.unobserve(e.target);
-        }
-      });
-    },{threshold:.12});
+    /* subsequent loads / back-navigation — show cards immediately, no re-animation */
     cards.forEach(function(c){
-      c.classList.add('ink-hidden');
-      io.observe(c);
+      c.style.opacity='1';
+      c.style.transform='';
+      c.classList.remove('ink-hidden');
     });
   }
 })();
@@ -2309,6 +2301,19 @@ document.addEventListener('keydown',function(e){
   var n=document.querySelectorAll('.deck-card').length;
   tally.textContent=(n<10?'0':'')+n+' in collection';
 })();
+
+/* ── BFCACHE FIX — pageshow fires when browser restores from back-forward cache.
+   Cards may have been frozen mid-animation with opacity:0 inline.
+   Reset them immediately so they're always visible on back navigation. ── */
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){
+    document.querySelectorAll('.deck-card').forEach(function(c){
+      c.style.opacity='1';
+      c.style.transform='';
+      c.classList.remove('ink-hidden');
+    });
+  }
+});
 
 /* ── 01 PAGE LOAD PROGRESS BAR ──────────────── */
 (function(){
